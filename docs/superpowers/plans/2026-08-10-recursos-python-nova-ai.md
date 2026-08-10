@@ -16,7 +16,7 @@ Estas reglas aplican a **todas** las tareas:
 
 - **Python 3.12** exacto. `.python-version` contiene `3.12`; `requires-python = ">=3.12"`.
 - **`uv` es el único gestor.** Nunca `pip install`, `python -m venv` ni activación manual de entornos. Todo comando de Python se ejecuta con `uv run`.
-- **Prosa en español, identificadores en inglés.** Guías, comentarios, docstrings y nombres de carpeta en español. Variables, funciones, clases y parámetros en inglés — incluida la infraestructura de `novatools/`.
+- **Prosa en español, identificadores en inglés.** Guías, comentarios, docstrings y nombres de carpeta en español. Variables, funciones, clases y parámetros en inglés — incluida la infraestructura de `novatools/` y las variables locales de scripts y tests. Dos excepciones deliberadas: los **nombres de las funciones de test** (son descripciones, no lógica) y las **banderas de los CLI** (son interfaz de usuario, como los nombres de carpeta).
 - **Términos técnicos sin traducir:** `list comprehension`, `type hints`, `fixture`. No "comprensión de listas".
 - **Carpetas en kebab-case.** Módulos con prefijo numérico de dos dígitos: `01-fundamentos`.
 - **Nunca una clave de API real** en ningún archivo. Solo `.env.example` con valores vacíos.
@@ -204,26 +204,24 @@ def test_solutions_enabled_lee_la_variable():
 
 
 def test_load_module_carga_un_archivo_suelto(tmp_path):
-    archivo = tmp_path / "saludo.py"
-    archivo.write_text(
-        'def greet(name):\n    return f"Hola, {name}"\n', encoding="utf-8"
-    )
+    file = tmp_path / "saludo.py"
+    file.write_text('def greet(name):\n    return f"Hola, {name}"\n', encoding="utf-8")
 
-    modulo = load_module(archivo)
+    module = load_module(file)
 
-    assert modulo.greet("Ana") == "Hola, Ana"
+    assert module.greet("Ana") == "Hola, Ana"
 
 
 def test_load_module_no_colisiona_entre_modulos(tmp_path):
-    uno = tmp_path / "01-fundamentos" / "ejercicios" / "base"
-    dos = tmp_path / "02-estructuras-de-datos" / "ejercicios" / "base"
-    uno.mkdir(parents=True)
-    dos.mkdir(parents=True)
-    (uno / "saludo.py").write_text("VALUE = 1\n", encoding="utf-8")
-    (dos / "saludo.py").write_text("VALUE = 2\n", encoding="utf-8")
+    first = tmp_path / "01-fundamentos" / "ejercicios" / "base"
+    second = tmp_path / "02-estructuras-de-datos" / "ejercicios" / "base"
+    first.mkdir(parents=True)
+    second.mkdir(parents=True)
+    (first / "saludo.py").write_text("VALUE = 1\n", encoding="utf-8")
+    (second / "saludo.py").write_text("VALUE = 2\n", encoding="utf-8")
 
-    assert load_module(uno / "saludo.py").VALUE == 1
-    assert load_module(dos / "saludo.py").VALUE == 2
+    assert load_module(first / "saludo.py").VALUE == 1
+    assert load_module(second / "saludo.py").VALUE == 2
 ```
 
 El último test es el que justifica la estrategia de nombres en `load_module`: dos ejercicios con el mismo nombre de archivo en módulos distintos son inevitables, y no pueden pisarse en `sys.modules`.
@@ -329,9 +327,9 @@ def solution(request):
     path = target_path(test_path, use_solutions)
 
     if not path.exists():
-        carpeta = "soluciones" if use_solutions else "ejercicios"
+        folder = "soluciones" if use_solutions else "ejercicios"
         pytest.fail(
-            f"Falta el archivo en {carpeta}/: {path}\n"
+            f"Falta el archivo en {folder}/: {path}\n"
             f"Cada test necesita su pareja: {test_path.name} -> {path.name}"
         )
 
@@ -548,7 +546,7 @@ from pathlib import Path
 
 from novatools.skeleton import ModuleSpec, create_module
 
-RAIZ = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent
 
 
 def main() -> None:
@@ -577,8 +575,8 @@ def main() -> None:
         objectives=tuple(args.objetivo),
     )
 
-    destino = create_module(RAIZ, spec)
-    print(f"Módulo creado en {destino.relative_to(RAIZ)}")
+    target = create_module(ROOT, spec)
+    print(f"Módulo creado en {target.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":
@@ -1270,13 +1268,13 @@ Run:
 ```bash
 uv run python -c "
 import re, pathlib
-raiz = pathlib.Path('.')
-rotos = []
+root = pathlib.Path('.')
+broken = []
 for doc in ('README.md', 'EMPIEZA-AQUI.md'):
-    for destino in re.findall(r']\((?!https?:)([^)#]+)\)', pathlib.Path(doc).read_text(encoding='utf-8')):
-        if not (raiz / destino).exists():
-            rotos.append(f'{doc} -> {destino}')
-print('\n'.join(rotos) if rotos else 'todos los enlaces locales existen')
+    for target in re.findall(r']\((?!https?:)([^)#]+)\)', pathlib.Path(doc).read_text(encoding='utf-8')):
+        if not (root / target).exists():
+            broken.append(f'{doc} -> {target}')
+print('\n'.join(broken) if broken else 'todos los enlaces locales existen')
 "
 ```
 Expected: `todos los enlaces locales existen`
@@ -2007,13 +2005,13 @@ Run:
 ```bash
 uv run python -c "
 import re, pathlib
-raiz = pathlib.Path('.')
-rotos = []
+root = pathlib.Path('.')
+broken = []
 for doc in ('README.md', 'EMPIEZA-AQUI.md', 'CONTRIBUTING.md'):
-    for destino in re.findall(r']\((?!https?:)([^)#]+)\)', pathlib.Path(doc).read_text(encoding='utf-8')):
-        if not (raiz / destino).exists():
-            rotos.append(f'{doc} -> {destino}')
-print('\n'.join(rotos) if rotos else 'todos los enlaces locales existen')
+    for target in re.findall(r']\((?!https?:)([^)#]+)\)', pathlib.Path(doc).read_text(encoding='utf-8')):
+        if not (root / target).exists():
+            broken.append(f'{doc} -> {target}')
+print('\n'.join(broken) if broken else 'todos los enlaces locales existen')
 "
 ```
 Expected: `todos los enlaces locales existen`
