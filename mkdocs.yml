@@ -1,0 +1,68 @@
+site_name: Recursos Python · Nova AI
+site_description: Ruta de capacitación en Python, de cero a agentes
+repo_url: https://github.com/full-stack-dev-johncastrosanabria/recursos-python-nova-ai
+edit_uri: edit/main/
+docs_dir: .
+
+theme:
+  name: material
+  language: es
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - search.highlight
+  palette:
+    - scheme: default
+      primary: indigo
+      toggle:
+        icon: material/weather-night
+        name: Modo oscuro
+    - scheme: slate
+      primary: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Modo claro
+
+plugins:
+  - search:
+      lang: es
+  - same-dir
+
+exclude_docs: |
+  .venv/
+  docs/superpowers/
+  scripts/
+  novatools/
+  tests/
+
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: true
+  - pymdownx.highlight
+  - pymdownx.superfences
+
+nav:
+  - Inicio: README.md
+  - Empieza aquí: EMPIEZA-AQUI.md
+  - Ruta:
+      - 01 · Fundamentos: ruta/01-fundamentos/GUIA.md
+      - 02 · Estructuras de datos: ruta/02-estructuras-de-datos/GUIA.md
+      - 03 · POO y módulos: ruta/03-poo-y-modulos/GUIA.md
+      - 04 · Entorno y herramientas: ruta/04-entorno-y-herramientas/GUIA.md
+      - 05 · Testing: ruta/05-testing/GUIA.md
+      - 06 · Async y concurrencia: ruta/06-async-y-concurrencia/GUIA.md
+      - 07 · Datos y APIs: ruta/07-datos-y-apis/GUIA.md
+      - 08 · Fundamentos de LLMs: ruta/08-llms-fundamentos/GUIA.md
+      - 09 · Agentes con LangGraph: ruta/09-agentes-langgraph/GUIA.md
+      - 10 · Agentes con CrewAI: ruta/10-agentes-crewai/GUIA.md
+      - 11 · Proyecto final: ruta/11-proyecto-final/GUIA.md
+  - Recursos:
+      - Enlaces: recursos/enlaces/README.md
+      - General: recursos/enlaces/general.md
+      - 01 · Fundamentos: recursos/enlaces/01-fundamentos.md
+      - 09 · Agentes: recursos/enlaces/09-agentes.md
+      - Cheatsheet de pytest: recursos/cheatsheets/pytest.md
+      - Plantillas: recursos/plantillas/README.md
+  - Contribuir: CONTRIBUTING.md
