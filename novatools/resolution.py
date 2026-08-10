@@ -45,6 +45,26 @@ def target_path(test_path: Path, use_solutions: bool) -> Path:
     return Path(*parts)
 
 
+def missing_pairs(root: Path) -> list[Path]:
+    """Encuentra tests de la ruta sin su archivo espejo en ejercicios/ o soluciones/.
+
+    Recorre `ruta/**/tests/**/test_*.py` y, para cada test, calcula dónde
+    debería vivir su stub (ejercicios/) y su solución de referencia
+    (soluciones/) con `target_path`. Devuelve las rutas que faltan.
+
+    El CI de soluciones ya comprueba que cada solución resuelve su test; esto
+    comprueba la otra mitad: que el stub del aprendiz también existe. Sin
+    esto, un PR que añada test y solución pero olvide el stub queda verde.
+    """
+    missing: list[Path] = []
+    for test_path in sorted((root / "ruta").glob("**/tests/**/test_*.py")):
+        for use_solutions in (False, True):
+            candidate = target_path(test_path, use_solutions)
+            if not candidate.exists():
+                missing.append(candidate)
+    return missing
+
+
 def load_module(path: Path) -> ModuleType:
     """Carga un archivo .py suelto como módulo, sin que su carpeta sea paquete."""
     resolved = path.resolve()

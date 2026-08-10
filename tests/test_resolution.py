@@ -4,7 +4,55 @@ from pathlib import Path
 
 import pytest
 
-from novatools.resolution import load_module, solutions_enabled, target_path
+from novatools.resolution import (
+    load_module,
+    missing_pairs,
+    solutions_enabled,
+    target_path,
+)
+
+
+def _write_exercise_trio(root, module="01-fundamentos", nivel="base", name="saludo"):
+    modulo_dir = root / "ruta" / module
+    (modulo_dir / "tests" / nivel).mkdir(parents=True, exist_ok=True)
+    (modulo_dir / "ejercicios" / nivel).mkdir(parents=True, exist_ok=True)
+    (modulo_dir / "soluciones" / nivel).mkdir(parents=True, exist_ok=True)
+    (modulo_dir / "tests" / nivel / f"test_{name}.py").write_text(
+        "def test_algo(solution):\n    pass\n", encoding="utf-8"
+    )
+    (modulo_dir / "ejercicios" / nivel / f"{name}.py").write_text("", encoding="utf-8")
+    (modulo_dir / "soluciones" / nivel / f"{name}.py").write_text("", encoding="utf-8")
+
+
+def test_missing_pairs_vacio_cuando_todo_esta_completo(tmp_path):
+    _write_exercise_trio(tmp_path)
+    assert missing_pairs(tmp_path) == []
+
+
+def test_missing_pairs_detecta_stub_faltante(tmp_path):
+    _write_exercise_trio(tmp_path)
+    (
+        tmp_path / "ruta" / "01-fundamentos" / "ejercicios" / "base" / "saludo.py"
+    ).unlink()
+
+    result = missing_pairs(tmp_path)
+
+    assert result == [
+        tmp_path / "ruta" / "01-fundamentos" / "ejercicios" / "base" / "saludo.py"
+    ]
+
+
+def test_missing_pairs_detecta_solucion_faltante(tmp_path):
+    _write_exercise_trio(tmp_path)
+    (
+        tmp_path / "ruta" / "01-fundamentos" / "soluciones" / "base" / "saludo.py"
+    ).unlink()
+
+    result = missing_pairs(tmp_path)
+
+    assert result == [
+        tmp_path / "ruta" / "01-fundamentos" / "soluciones" / "base" / "saludo.py"
+    ]
 
 
 def test_target_path_apunta_a_ejercicios_por_defecto():

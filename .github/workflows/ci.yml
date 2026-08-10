@@ -30,3 +30,14 @@ jobs:
         env:
           NOVA_SOLUCIONES: "1"
         run: uv run pytest -v
+
+      - name: Verificar que cada test tiene su pareja en ejercicios/ y soluciones/
+        run: uv run python scripts/verificar_parejas.py
+
+      - name: Verificar que la ruta falla sin soluciones (nadie dejó la respuesta puesta)
+        run: |
+          if uv run pytest ruta; then
+            echo "Los tests de ruta/ pasaron SIN NOVA_SOLUCIONES=1."
+            echo "Eso significa que algún stub en ejercicios/ ya trae la solución."
+            exit 1
+          fi
