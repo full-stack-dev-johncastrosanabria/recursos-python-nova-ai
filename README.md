@@ -56,9 +56,9 @@ sus objetivos definidos, a la espera de que alguien los escriba. Empieza por
 
 ## Recursos de consulta
 
-- [Enlaces curados](recursos/enlaces/) — artículos, vídeos y cursos por tema
-- [Cheatsheets](recursos/cheatsheets/) — referencias rápidas
-- [Plantillas](recursos/plantillas/) — scaffolds de proyecto reutilizables
+- [Enlaces curados](recursos/enlaces/README.md) — artículos, vídeos y cursos por tema
+- [Cheatsheets](recursos/cheatsheets/README.md) — referencias rápidas
+- [Plantillas](recursos/plantillas/README.md) — scaffolds de proyecto reutilizables (todavía por escribir)
 
 ## Claves de API
 
@@ -70,6 +70,7 @@ Ollama.
 
 ## Licencia
 
-Doble licencia: el **código** bajo [MIT](LICENSE), el **contenido** (guías,
-cheatsheets, listas de enlaces) bajo
-[CC BY 4.0](LICENSE-CONTENIDO).
+Doble licencia: el **código** bajo
+[MIT](https://github.com/full-stack-dev-johncastrosanabria/recursos-python-nova-ai/blob/main/LICENSE),
+el **contenido** (guías, cheatsheets, listas de enlaces) bajo
+[CC BY 4.0](https://github.com/full-stack-dev-johncastrosanabria/recursos-python-nova-ai/blob/main/LICENSE-CONTENIDO).

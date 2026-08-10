@@ -63,6 +63,7 @@ nav:
       - General: recursos/enlaces/general.md
       - 01 · Fundamentos: recursos/enlaces/01-fundamentos.md
       - 09 · Agentes: recursos/enlaces/09-agentes.md
+      - Cheatsheets: recursos/cheatsheets/README.md
       - Cheatsheet de pytest: recursos/cheatsheets/pytest.md
       - Plantillas: recursos/plantillas/README.md
   - Contribuir: CONTRIBUTING.md
