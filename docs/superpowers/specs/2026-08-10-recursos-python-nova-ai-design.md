@@ -46,7 +46,9 @@ recursos-python-nova-ai/
 ├── uv.lock
 ├── .python-version
 ├── mkdocs.yml
-├── conftest.py                # resolución ejercicios/soluciones (ver CI)
+├── conftest.py                # expone la fixture `solution` (ver CI)
+├── novatools/                 # infraestructura del repo (resolución, esqueletos)
+├── tests/                     # tests de novatools (no de la ruta)
 ├── .env.example
 ├── .devcontainer/
 │   └── devcontainer.json      # Codespaces para nivel cero
@@ -63,6 +65,8 @@ recursos-python-nova-ai/
 │       │   ├── base/
 │       │   └── reto/
 │       └── tests/
+│           ├── base/
+│           └── reto/
 ├── recursos/                  # consulta: se accede salteado
 │   ├── enlaces/
 │   ├── cheatsheets/
@@ -128,7 +132,8 @@ fija:
 - `ejercicios/base/` — stubs para consolidar lo del módulo.
 - `ejercicios/reto/` — stubs para quien ya llegaba sabiendo el tema.
 - `soluciones/` — espejo de `ejercicios/`, misma estructura de archivos.
-- `tests/` — pytest, uno por ejercicio.
+- `tests/base/` y `tests/reto/` — pytest, uno por ejercicio, espejo exacto de
+  `ejercicios/`. `tests/base/test_saludo.py` prueba `ejercicios/base/saludo.py`.
 
 ### Contenido del commit inicial
 
@@ -215,17 +220,19 @@ Se editan a mano en markdown. Sin YAML ni paso de generación.
 Los tests de los ejercicios fallan por diseño: son stubs. El CI no puede correr
 `pytest` a secas y quedarse verde.
 
-Un `conftest.py` en la raíz expone una fixture `solucion` que carga el módulo del
+Un `conftest.py` en la raíz expone una fixture `solution` que carga el módulo del
 ejercicio bajo prueba. Los tests nunca hacen `import` directo del ejercicio; piden
 la fixture y trabajan con lo que devuelve:
 
 ```python
-def test_saluda(solucion):
-    assert solucion.greet("Ana") == "Hola, Ana"
+def test_greet(solution):
+    assert solution.greet("Ana") == "Hola, Ana"
 ```
 
-La fixture resuelve la ruta del archivo a partir del nombre del test
-(`tests/test_ej_01_saludo.py` → `ej_01_saludo.py`) y elige la carpeta origen:
+La fixture traduce la ruta del test a la del ejercicio sustituyendo el segmento
+`tests` y quitando el prefijo `test_`
+(`ruta/01-fundamentos/tests/base/test_saludo.py` →
+`ruta/01-fundamentos/ejercicios/base/saludo.py`), y elige la carpeta origen:
 
 - Sin variable de entorno → carga desde `ejercicios/`. El aprendiz ve rojo hasta
   resolver.
