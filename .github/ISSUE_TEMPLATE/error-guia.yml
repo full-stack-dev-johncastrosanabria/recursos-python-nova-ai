@@ -1,0 +1,29 @@
+name: Error en una guía
+description: Algo está mal, poco claro o no funciona
+title: "[Error] "
+labels: ["error-guia"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Si estás aprendiendo y algo no te cuadra, este issue es para ti.
+        No hace falta que sepas cuál es la solución.
+  - type: input
+    id: donde
+    attributes:
+      label: Dónde
+      placeholder: "ruta/01-fundamentos/GUIA.md, sección 3"
+    validations:
+      required: true
+  - type: textarea
+    id: problema
+    attributes:
+      label: Qué pasa
+      description: Qué esperabas y qué te encontraste.
+    validations:
+      required: true
+  - type: textarea
+    id: entorno
+    attributes:
+      label: Cómo lo estás ejecutando
+      placeholder: "Codespaces, o macOS con uv 0.11"

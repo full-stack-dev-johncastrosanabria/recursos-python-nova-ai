@@ -1,0 +1,40 @@
+name: Proponer un recurso
+description: Un enlace, curso o libro que merece estar en la biblioteca
+title: "[Recurso] "
+labels: ["recurso"]
+body:
+  - type: input
+    id: url
+    attributes:
+      label: Enlace
+      placeholder: https://
+    validations:
+      required: true
+  - type: dropdown
+    id: tipo
+    attributes:
+      label: Tipo
+      options: [artículo, vídeo, curso, libro, repo, doc-oficial]
+    validations:
+      required: true
+  - type: dropdown
+    id: nivel
+    attributes:
+      label: Nivel
+      options: [principiante, intermedio, avanzado]
+    validations:
+      required: true
+  - type: input
+    id: modulo
+    attributes:
+      label: Módulo relacionado
+      placeholder: "05-testing, o 'general' si no encaja en ninguno"
+    validations:
+      required: true
+  - type: textarea
+    id: porque
+    attributes:
+      label: Por qué vale la pena
+      description: Una línea. Es lo que acabará en la lista.
+    validations:
+      required: true
