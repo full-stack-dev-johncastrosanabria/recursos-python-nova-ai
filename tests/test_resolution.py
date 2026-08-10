@@ -43,9 +43,7 @@ def test_solutions_enabled_lee_la_variable():
 
 def test_load_module_carga_un_archivo_suelto(tmp_path):
     file = tmp_path / "saludo.py"
-    file.write_text(
-        'def greet(name):\n    return f"Hola, {name}"\n', encoding="utf-8"
-    )
+    file.write_text('def greet(name):\n    return f"Hola, {name}"\n', encoding="utf-8")
 
     module = load_module(file)
 
