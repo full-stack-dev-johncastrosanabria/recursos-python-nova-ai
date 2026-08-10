@@ -68,6 +68,12 @@ def missing_pairs(root: Path) -> list[Path]:
 def load_module(path: Path) -> ModuleType:
     """Carga un archivo .py suelto como módulo, sin que su carpeta sea paquete."""
     resolved = path.resolve()
+    # Las últimas 4 partes (p. ej. 01-fundamentos/ejercicios/base/saludo)
+    # bastan para que el nombre sea único mientras la anatomía de un módulo
+    # no tenga más de 2 niveles de anidamiento bajo ejercicios/soluciones/.
+    # Si se añade una subcarpeta más (p. ej. ejercicios/base/subtema/x.py),
+    # esta ventana deja fuera el nombre del módulo y dos módulos distintos
+    # podrían colisionar en sys.modules. Si eso pasa, sube este número.
     tail = "_".join(resolved.with_suffix("").parts[-4:])
     module_name = "nova_" + re.sub(r"\W+", "_", tail)
 
