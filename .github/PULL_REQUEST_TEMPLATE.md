@@ -13,6 +13,7 @@
 ## Comprobado
 
 - [ ] `uv run ruff check .` sin errores
+- [ ] `uv run ruff format --check .` sin errores
 - [ ] `NOVA_SOLUCIONES=1 uv run pytest` en verde
 - [ ] Si añadí un ejercicio: sin la variable **falla**, con la variable **pasa**
 - [ ] Si añadí enlaces: llevan las tres etiquetas y la línea de por qué
