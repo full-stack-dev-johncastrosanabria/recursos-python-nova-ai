@@ -1,0 +1,29 @@
+name: Enlaces
+
+on:
+  pull_request:
+    paths:
+      - "recursos/**"
+      - "**/*.md"
+  schedule:
+    # Lunes a las 06:00 UTC.
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+jobs:
+  lychee:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Buscar enlaces rotos
+        uses: lycheeverse/lychee-action@v2
+        with:
+          # 429 es rate limiting, no un enlace roto.
+          args: >-
+            --no-progress
+            --accept 200,206,429
+            --exclude-path .venv
+            --exclude-path site
+            './**/*.md'
+          fail: true
