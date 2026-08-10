@@ -67,8 +67,13 @@ uv run pytest ruta/{folder_name(spec)}
 """
 
 
-def create_module(root: Path, spec: ModuleSpec) -> Path:
-    """Crea las carpetas y la GUIA.md del módulo. Idempotente."""
+def create_module(root: Path, spec: ModuleSpec, force: bool = False) -> Path:
+    """Crea las carpetas del módulo y escribe su GUIA.md.
+
+    Las subcarpetas son idempotentes: se pueden recrear sin riesgo. La
+    GUIA.md no lo es: si ya existe, no se sobrescribe salvo que `force` sea
+    `True`, para no destruir contenido ya escrito por error.
+    """
     module_dir = root / "ruta" / folder_name(spec)
 
     for sub in SUBFOLDERS:
@@ -76,5 +81,13 @@ def create_module(root: Path, spec: ModuleSpec) -> Path:
         target.mkdir(parents=True, exist_ok=True)
         (target / ".gitkeep").touch()
 
-    (module_dir / "GUIA.md").write_text(render_guide(spec), encoding="utf-8")
+    guide_path = module_dir / "GUIA.md"
+    if guide_path.exists() and not force:
+        raise FileExistsError(
+            f"Ya existe {guide_path} y no se va a sobrescribir. "
+            "Si de verdad quieres reemplazarla, usa force=True "
+            "(o --forzar desde la línea de comandos)."
+        )
+
+    guide_path.write_text(render_guide(spec), encoding="utf-8")
     return module_dir

@@ -33,6 +33,11 @@ def main() -> None:
         default=[],
         help="repetible: un objetivo de aprendizaje por bandera",
     )
+    parser.add_argument(
+        "--forzar",
+        action="store_true",
+        help="sobrescribe la GUIA.md si ya existe",
+    )
     args = parser.parse_args()
 
     spec = ModuleSpec(
@@ -45,7 +50,12 @@ def main() -> None:
         objectives=tuple(args.objetivo),
     )
 
-    target = create_module(ROOT, spec)
+    try:
+        target = create_module(ROOT, spec, force=args.forzar)
+    except FileExistsError as error:
+        print(f"Error: {error}", file=sys.stderr)
+        sys.exit(1)
+
     print(f"Módulo creado en {target.relative_to(ROOT)}")
 
 

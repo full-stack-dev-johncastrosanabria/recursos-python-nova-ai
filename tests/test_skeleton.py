@@ -1,5 +1,7 @@
 """Tests del generador de esqueletos de módulo."""
 
+import pytest
+
 from novatools.skeleton import (
     SUBFOLDERS,
     ModuleSpec,
@@ -52,8 +54,52 @@ def test_create_module_escribe_la_guia(tmp_path):
     assert "# Módulo 05 · Testing" in guide
 
 
-def test_create_module_es_idempotente(tmp_path):
+def test_create_module_no_sobrescribe_una_guia_existente(tmp_path):
     create_module(tmp_path, EXAMPLE)
-    module_dir = create_module(tmp_path, EXAMPLE)
+    guide_path = tmp_path / "ruta" / "05-testing" / "GUIA.md"
+    original_content = guide_path.read_text(encoding="utf-8")
 
-    assert (module_dir / "GUIA.md").exists()
+    otro_spec = ModuleSpec(
+        number=5,
+        slug="testing",
+        title="Otro título completamente distinto",
+        prerequisites="nada",
+        minutes=1,
+        skip_to="nunca",
+        objectives=("otro objetivo",),
+    )
+
+    with pytest.raises(FileExistsError):
+        create_module(tmp_path, otro_spec)
+
+    assert guide_path.read_text(encoding="utf-8") == original_content
+
+
+def test_create_module_lanza_excepcion_con_ruta_y_como_forzar(tmp_path):
+    create_module(tmp_path, EXAMPLE)
+
+    with pytest.raises(FileExistsError) as exc_info:
+        create_module(tmp_path, EXAMPLE)
+
+    message = str(exc_info.value)
+    assert "GUIA.md" in message
+    assert "force" in message
+
+
+def test_create_module_con_force_si_sobrescribe(tmp_path):
+    create_module(tmp_path, EXAMPLE)
+
+    otro_spec = ModuleSpec(
+        number=5,
+        slug="testing",
+        title="Otro título completamente distinto",
+        prerequisites="nada",
+        minutes=1,
+        skip_to="nunca",
+        objectives=("otro objetivo",),
+    )
+
+    module_dir = create_module(tmp_path, otro_spec, force=True)
+
+    guide = (module_dir / "GUIA.md").read_text(encoding="utf-8")
+    assert "Otro título completamente distinto" in guide
