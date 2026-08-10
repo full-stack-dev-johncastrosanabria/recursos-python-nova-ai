@@ -30,6 +30,9 @@ testpaths = ["tests", "ruta"]
 [tool.ruff]
 target-version = "py312"
 line-length = 88
+# El markdown es material didáctico: sus ejemplos están escritos para
+# enseñar, no para pasar un formateador.
+extend-exclude = ["*.md"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
