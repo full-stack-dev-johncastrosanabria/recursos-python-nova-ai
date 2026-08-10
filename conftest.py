@@ -20,9 +20,9 @@ def solution(request):
     path = target_path(test_path, use_solutions)
 
     if not path.exists():
-        carpeta = "soluciones" if use_solutions else "ejercicios"
+        folder = "soluciones" if use_solutions else "ejercicios"
         pytest.fail(
-            f"Falta el archivo en {carpeta}/: {path}\n"
+            f"Falta el archivo en {folder}/: {path}\n"
             f"Cada test necesita su pareja: {test_path.name} -> {path.name}"
         )
 

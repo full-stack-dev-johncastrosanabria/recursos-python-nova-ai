@@ -42,23 +42,23 @@ def test_solutions_enabled_lee_la_variable():
 
 
 def test_load_module_carga_un_archivo_suelto(tmp_path):
-    archivo = tmp_path / "saludo.py"
-    archivo.write_text(
+    file = tmp_path / "saludo.py"
+    file.write_text(
         'def greet(name):\n    return f"Hola, {name}"\n', encoding="utf-8"
     )
 
-    modulo = load_module(archivo)
+    module = load_module(file)
 
-    assert modulo.greet("Ana") == "Hola, Ana"
+    assert module.greet("Ana") == "Hola, Ana"
 
 
 def test_load_module_no_colisiona_entre_modulos(tmp_path):
-    uno = tmp_path / "01-fundamentos" / "ejercicios" / "base"
-    dos = tmp_path / "02-estructuras-de-datos" / "ejercicios" / "base"
-    uno.mkdir(parents=True)
-    dos.mkdir(parents=True)
-    (uno / "saludo.py").write_text("VALUE = 1\n", encoding="utf-8")
-    (dos / "saludo.py").write_text("VALUE = 2\n", encoding="utf-8")
+    first = tmp_path / "01-fundamentos" / "ejercicios" / "base"
+    second = tmp_path / "02-estructuras-de-datos" / "ejercicios" / "base"
+    first.mkdir(parents=True)
+    second.mkdir(parents=True)
+    (first / "saludo.py").write_text("VALUE = 1\n", encoding="utf-8")
+    (second / "saludo.py").write_text("VALUE = 2\n", encoding="utf-8")
 
-    assert load_module(uno / "saludo.py").VALUE == 1
-    assert load_module(dos / "saludo.py").VALUE == 2
+    assert load_module(first / "saludo.py").VALUE == 1
+    assert load_module(second / "saludo.py").VALUE == 2
