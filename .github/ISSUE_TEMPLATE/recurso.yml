@@ -18,6 +18,13 @@ body:
     validations:
       required: true
   - type: dropdown
+    id: idioma
+    attributes:
+      label: Idioma
+      options: [es, en]
+    validations:
+      required: true
+  - type: dropdown
     id: nivel
     attributes:
       label: Nivel
