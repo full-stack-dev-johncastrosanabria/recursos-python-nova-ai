@@ -11,6 +11,11 @@ después.
 Ve bajando. En cuanto respondas **"no"** a una pregunta, ese es tu módulo de
 entrada. Empieza ahí.
 
+Por ahora solo el módulo 01 tiene contenido escrito; del 02 al 11 son
+esqueletos con sus objetivos definidos, todavía sin guía. Si tu módulo de
+entrada es uno de esos, revisa igual sus ejercicios y considera escribir tú
+la guía (mira `CONTRIBUTING.md`).
+
 ## Las preguntas
 
 **1. ¿Has escrito alguna vez código en cualquier lenguaje?**
