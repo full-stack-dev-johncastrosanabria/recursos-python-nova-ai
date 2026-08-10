@@ -99,6 +99,11 @@ testpaths = ["tests", "ruta"]
 [tool.ruff]
 target-version = "py312"
 line-length = 88
+# El markdown es material didáctico: sus ejemplos están escritos para
+# enseñar, no para pasar un formateador. Ruff formatea los bloques de código
+# Python dentro de .md y rompería la convención de docstrings con ejemplos
+# indentados que usan todos los stubs.
+extend-exclude = ["*.md"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
