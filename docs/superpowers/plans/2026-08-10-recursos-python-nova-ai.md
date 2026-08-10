@@ -1506,11 +1506,17 @@ El plugin `same-dir` es lo que permite que la raíz del repositorio sea el
 `docs_dir`. Sin él, MkDocs exigiría una carpeta `docs/` con copias del
 markdown.
 
+`docs_dir: .` es obligatorio y no decorativo: el plugin solo neutraliza la
+validación de un `docs_dir` que ya esté declarado, nunca lo inyecta por su
+cuenta. Sin esa línea, las 19 entradas de `nav` fallan con advertencia de
+archivo no encontrado.
+
 ```yaml
 site_name: Recursos Python · Nova AI
 site_description: Ruta de capacitación en Python, de cero a agentes
 repo_url: https://github.com/full-stack-dev-johncastrosanabria/recursos-python-nova-ai
 edit_uri: edit/main/
+docs_dir: .
 
 theme:
   name: material
