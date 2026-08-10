@@ -1084,7 +1084,8 @@ uv run python scripts/nuevo_modulo.py 9 agentes-langgraph "Agentes con LangGraph
   --objetivo "Insertar un paso de human-in-the-loop"
 
 uv run python scripts/nuevo_modulo.py 10 agentes-crewai "Agentes con CrewAI" \
-  --prerrequisitos "módulos 01-08" --minutos 180 --salto "salta al módulo 11" \
+  --prerrequisitos "módulos 01-08, y el 09 si quieres comparar ambos enfoques" \
+  --minutos 180 --salto "salta al módulo 11" \
   --objetivo "Definir agentes con rol, objetivo y contexto" \
   --objetivo "Componer tareas y encadenarlas" \
   --objetivo "Delegar trabajo entre agentes" \

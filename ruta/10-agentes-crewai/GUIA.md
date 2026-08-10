@@ -1,6 +1,6 @@
 # Módulo 10 · Agentes con CrewAI
 
-> **Prerrequisitos:** módulos 01-08
+> **Prerrequisitos:** módulos 01-08, y el 09 si quieres comparar ambos enfoques
 > **Tiempo estimado:** 180 min
 > **Si ya dominas esto:** salta al módulo 11
 
