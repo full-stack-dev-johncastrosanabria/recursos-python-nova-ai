@@ -1,7 +1,7 @@
 # Módulo 08 · Fundamentos de LLMs
 
-> **Prerrequisitos:** módulos 01-07
-> **Tiempo estimado:** 150 min
+> **Prerrequisitos:** módulos 01-07<br>
+> **Tiempo estimado:** 150 min<br>
 > **Si ya dominas esto:** salta al módulo 09
 
 A partir de aquí la ruta cambia de tema, pero no de método. Un LLM es una

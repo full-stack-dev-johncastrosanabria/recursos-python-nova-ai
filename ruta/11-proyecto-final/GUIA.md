@@ -1,7 +1,7 @@
 # Módulo 11 · Proyecto final
 
-> **Prerrequisitos:** toda la ruta
-> **Tiempo estimado:** 300 min
+> **Prerrequisitos:** toda la ruta<br>
+> **Tiempo estimado:** 300 min<br>
 > **Si ya dominas esto:** no hay siguiente: este es el final
 
 Vas a construir **Guardia**, un asistente de conciliación: recibe los

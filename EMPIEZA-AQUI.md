@@ -11,10 +11,15 @@ después.
 Ve bajando. En cuanto respondas **"no"** a una pregunta, ese es tu módulo de
 entrada. Empieza ahí.
 
-Por ahora solo el módulo 01 tiene contenido escrito; del 02 al 11 son
-esqueletos con sus objetivos definidos, todavía sin guía. Si tu módulo de
-entrada es uno de esos, revisa igual sus ejercicios y considera escribir tú
-la guía (mira `CONTRIBUTING.md`).
+Los doce módulos tienen contenido, ejercicios y tests. Puedes hacerlos en orden
+o entrar por donde te toque: cada guía dice qué asume que ya sabes.
+
+!!! tip "Antes de la primera pregunta"
+
+    Si programas en otro lenguaje y vienes a Python, el
+    [módulo 00](ruta/00-como-piensa-python/GUIA.md) no cubre sintaxis: cubre
+    los cinco modelos mentales con los que se razona en este lenguaje. Es corto
+    y ahorra bastante desconcierto más adelante.
 
 ## Las preguntas
 
@@ -53,10 +58,22 @@ Si no → [módulo 08 · Fundamentos de LLMs](ruta/08-llms-fundamentos/GUIA.md)
 
 **¿Respondiste que sí a todas?**
 Vete directo a [LangGraph](ruta/09-agentes-langgraph/GUIA.md) y
-[CrewAI](ruta/10-agentes-crewai/GUIA.md), que es a donde va esta ruta.
+[CrewAI](ruta/10-agentes-crewai/GUIA.md), que es a donde va esta ruta. Y si
+también los conoces, el [proyecto final](ruta/11-proyecto-final/GUIA.md) es
+donde se junta todo.
 
 ## Si vas sobrado en tu módulo
 
 Cada guía abre diciendo sus prerrequisitos y a dónde saltar si ya dominas el
 tema. Y cada módulo tiene ejercicios en `ejercicios/reto/` además de los de
 `ejercicios/base/`: si los de base te resultan triviales, haz solo los retos.
+
+## Si te quedas atascado
+
+En `soluciones/` está la versión de referencia de cada ejercicio. Míralas
+**después** de intentarlo, no antes: leer una solución da la sensación de haber
+aprendido sin haber aprendido.
+
+Si crees que la guía está equivocada o poco clara, probablemente tengas razón —
+quien está aprendiendo es quien detecta esos fallos. Abre un issue de tipo
+*error en una guía*; no hace falta que sepas cuál es el arreglo.

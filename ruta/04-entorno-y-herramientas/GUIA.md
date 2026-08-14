@@ -1,7 +1,7 @@
 # Módulo 04 · Entorno y herramientas
 
-> **Prerrequisitos:** módulos 01-03
-> **Tiempo estimado:** 90 min
+> **Prerrequisitos:** módulos 01-03<br>
+> **Tiempo estimado:** 90 min<br>
 > **Si ya dominas esto:** salta al módulo 05
 
 Hasta aquí has escrito Python. Este módulo va de lo que rodea al código y

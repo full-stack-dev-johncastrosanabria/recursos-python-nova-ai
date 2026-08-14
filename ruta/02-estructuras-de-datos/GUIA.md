@@ -1,7 +1,7 @@
 # Módulo 02 · Estructuras de datos
 
-> **Prerrequisitos:** módulo 01
-> **Tiempo estimado:** 120 min
+> **Prerrequisitos:** módulo 01<br>
+> **Tiempo estimado:** 120 min<br>
 > **Si ya dominas esto:** salta al módulo 03
 
 Cuatro estructuras integradas —`list`, `tuple`, `dict`, `set`— cubren el 95% de

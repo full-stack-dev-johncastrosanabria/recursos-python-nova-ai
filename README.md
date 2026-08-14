@@ -1,13 +1,40 @@
 # Recursos Python · Nova AI
 
 Ruta de capacitación en Python para el equipo, de nivel cero a construir
-agentes con LangGraph y CrewAI. Incluye guías, código ejecutable, ejercicios
-con tests y una biblioteca de enlaces curados.
+agentes con LangGraph y CrewAI. Doce módulos con guías, código que se ejecuta,
+**343 tests** que verifican tus ejercicios, y una biblioteca de enlaces
+curados.
 
-**¿No sabes por dónde empezar?** Lee [EMPIEZA-AQUI.md](EMPIEZA-AQUI.md): son
-diez preguntas y te dice tu módulo de entrada.
+No es un catálogo de sintaxis. Cada módulo empieza por el criterio —cuándo usar
+algo y cuándo no— y termina en ejercicios que fallan hasta que los resuelves.
 
-## Arranque rápido
+<div class="nova-tarjetas" markdown>
+
+<div class="nova-tarjeta" markdown>
+**[¿Por dónde empiezo?](EMPIEZA-AQUI.md)**
+{ .nova-titulo }
+
+Diez preguntas y te dice tu módulo de entrada. No hace falta empezar por el
+principio.
+</div>
+
+<div class="nova-tarjeta" markdown>
+**[Arranque rápido](#arranque-rapido)**
+{ .nova-titulo }
+
+Un `git clone` y un comando. `uv` instala hasta el propio Python.
+</div>
+
+<div class="nova-tarjeta" markdown>
+**[Contribuir](CONTRIBUTING.md)**
+{ .nova-titulo }
+
+Tres recetas concretas: añadir un enlace, un ejercicio o una guía.
+</div>
+
+</div>
+
+## Arranque rápido { #arranque-rapido }
 
 ### Sin instalar nada
 
@@ -28,49 +55,93 @@ uv run pytest ruta/01-fundamentos
 
 Los tests te saldrán en rojo. Es correcto: son los ejercicios sin resolver.
 
-Cuando llegues al módulo 08 necesitarás las dependencias de IA:
+Cuando llegues al módulo 08 y quieras hablar con un modelo de verdad:
 
 ```bash
 uv sync --group ia
+cp .env.example .env      # y pon tu clave dentro
 ```
 
 ## La ruta
 
+### Fundamentos
+
 | # | Módulo | Qué cubre |
 |---|--------|-----------|
+| [00](ruta/00-como-piensa-python/GUIA.md) | Cómo piensa Python | los cinco modelos mentales, el Zen, protocolos |
 | [01](ruta/01-fundamentos/GUIA.md) | Fundamentos | sintaxis, tipos, control de flujo, funciones |
-| [02](ruta/02-estructuras-de-datos/GUIA.md) | Estructuras de datos | listas, dicts, sets, comprehensions, generadores |
-| [03](ruta/03-poo-y-modulos/GUIA.md) | POO y módulos | clases, dataclasses, paquetes e imports |
-| [04](ruta/04-entorno-y-herramientas/GUIA.md) | Entorno y herramientas | uv, ruff, type hints, anatomía de un proyecto |
-| [05](ruta/05-testing/GUIA.md) | Testing | pytest, fixtures, parametrize, TDD básico |
-| [06](ruta/06-async-y-concurrencia/GUIA.md) | Async y concurrencia | async/await, asyncio, cuándo no usarlo |
-| [07](ruta/07-datos-y-apis/GUIA.md) | Datos y APIs | pydantic, httpx, FastAPI, pandas |
-| [08](ruta/08-llms-fundamentos/GUIA.md) | Fundamentos de LLMs | SDK de Claude, prompts, tool use, RAG |
-| [09](ruta/09-agentes-langgraph/GUIA.md) | Agentes con LangGraph | grafos de estado, checkpoints, human-in-the-loop |
-| [10](ruta/10-agentes-crewai/GUIA.md) | Agentes con CrewAI | agentes por roles, tareas, delegación |
-| [11](ruta/11-proyecto-final/GUIA.md) | Proyecto final | un agente completo, de punta a punta |
+| [02](ruta/02-estructuras-de-datos/GUIA.md) | Estructuras de datos | costes por dentro, álgebra de conjuntos, generadores |
+| [03](ruta/03-poo-y-modulos/GUIA.md) | POO y módulos | clases, dataclasses, imports y arquitectura |
 
-Ahora mismo **solo el módulo 01 tiene contenido**. El resto son esqueletos con
-sus objetivos definidos, a la espera de que alguien los escriba. Empieza por
-[CONTRIBUTING.md](CONTRIBUTING.md) si quieres ser esa persona.
+### El oficio
+
+| # | Módulo | Qué cubre |
+|---|--------|-----------|
+| [04](ruta/04-entorno-y-herramientas/GUIA.md) | Entorno y herramientas | uv, ruff, type hints, secretos |
+| [05](ruta/05-testing/GUIA.md) | Testing | pytest, fixtures, parametrize, la pirámide |
+| [06](ruta/06-async-y-concurrencia/GUIA.md) | Async y concurrencia | el criterio, gather, semáforos |
+| [07](ruta/07-datos-y-apis/GUIA.md) | Datos y APIs | pydantic, httpx, FastAPI, pandas |
+
+### Inteligencia artificial
+
+| # | Módulo | Qué cubre |
+|---|--------|-----------|
+| [08](ruta/08-llms-fundamentos/GUIA.md) | Fundamentos de LLMs | tokens, prompts, tool use, RAG |
+| [09](ruta/09-agentes-langgraph/GUIA.md) | Agentes con LangGraph | grafos de estado, reducers, ciclos con tope |
+| [10](ruta/10-agentes-crewai/GUIA.md) | Agentes con CrewAI | roles, tareas encadenadas, delegación |
+| [11](ruta/11-proyecto-final/GUIA.md) | Proyecto final | un sistema completo, de punta a punta |
+
+## Cómo funcionan los ejercicios
+
+Cada módulo tiene la misma anatomía:
+
+```text
+ruta/NN-modulo/
+├── GUIA.md          la lección
+├── ejemplos/        código que se lee y se ejecuta
+├── ejercicios/      lo que completas tú (base/ y reto/)
+├── soluciones/      la versión de referencia
+└── tests/           lo que dice si acertaste
+```
+
+Los ejercicios son funciones sin terminar. Sus tests **fallan a propósito**
+hasta que los resuelves:
+
+```bash
+uv run pytest ruta/02-estructuras-de-datos          # rojo: aún no lo has hecho
+uv run pytest ruta/02-estructuras-de-datos -k conciliacion   # solo uno
+```
+
+Los tests no importan tu archivo directamente: piden una fixture llamada
+`solution`, que carga tu ejercicio o —cuando corre el CI— la solución de
+referencia. Así el repositorio verifica que **todo ejercicio publicado es
+resoluble**, que es el fallo típico del material didáctico: un enunciado que no
+cuadra con su test.
+
+Hay ejercicios de dos niveles en cada módulo: `base/` para consolidar y `reto/`
+si ya llegabas sabiendo el tema.
 
 ## Recursos de consulta
 
-- [Enlaces curados](recursos/enlaces/README.md) — artículos, vídeos y cursos por tema
+- [Enlaces curados](recursos/enlaces/README.md) — artículos, vídeos y cursos
+  por tema, cada uno con una línea explicando por qué vale la pena
 - [Cheatsheets](recursos/cheatsheets/README.md) — referencias rápidas
-- [Plantillas](recursos/plantillas/README.md) — scaffolds de proyecto reutilizables (todavía por escribir)
+- [Plantillas](recursos/plantillas/README.md) — scaffolds reutilizables
+  (todavía por escribir)
 
 ## Claves de API
 
-Los módulos 08 al 11 llaman a modelos de pago. Copia `.env.example` a `.env` y
-pon tus propias claves; `.env` está en `.gitignore` y nunca debe subirse.
+Los módulos 08 al 11 pueden llamar a modelos de pago, pero **sus ejercicios no
+necesitan clave ni conexión**: prueban el código que rodea al modelo, que es lo
+que se puede probar. Si quieres además hablar con un modelo de verdad, copia
+`.env.example` a `.env` y pon la tuya. `.env` está en `.gitignore`.
 
-Si no quieres gastar, el módulo 08 documenta cómo usar modelos locales con
-Ollama.
-
-## Licencia
+## Licencia y créditos
 
 Doble licencia: el **código** bajo
 [MIT](https://github.com/full-stack-dev-johncastrosanabria/recursos-python-nova-ai/blob/main/LICENSE),
 el **contenido** (guías, cheatsheets, listas de enlaces) bajo
 [CC BY 4.0](https://github.com/full-stack-dev-johncastrosanabria/recursos-python-nova-ai/blob/main/LICENSE-CONTENIDO).
+
+La estructura de la ruta y varios de los casos reales se apoyan en el libro
+*Python: El Lenguaje del Pensamiento* (edición 2026).

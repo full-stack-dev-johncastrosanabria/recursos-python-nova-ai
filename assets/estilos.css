@@ -1,0 +1,100 @@
+/* Ajustes de lectura para el sitio de la ruta.
+   La prioridad es una sola: que un módulo largo se lea sin cansar. */
+
+:root {
+  --nova-borde: rgba(128, 128, 128, 0.24);
+}
+
+/* Cuerpo de texto algo más generoso: estas guías se leen enteras. */
+.md-typeset {
+  font-size: 0.79rem;
+  line-height: 1.72;
+}
+
+.md-typeset h1 {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.md-typeset h2 {
+  margin-top: 2.2em;
+  padding-top: 0.6em;
+  border-top: 1px solid var(--nova-borde);
+  font-weight: 650;
+}
+
+.md-typeset h3 {
+  margin-top: 1.6em;
+  font-weight: 600;
+}
+
+/* La cabecera de cada módulo (prerrequisitos, tiempo, salto) es una cita.
+   Se convierte en una tarjeta para que se lea de un vistazo. */
+.md-typeset blockquote {
+  border-left: 3px solid var(--md-accent-fg-color);
+  background: var(--md-code-bg-color);
+  border-radius: 0 0.2rem 0.2rem 0;
+  padding: 0.75em 1em;
+  color: inherit;
+}
+
+.md-typeset blockquote p {
+  margin: 0.2em 0;
+}
+
+/* Tablas: muchas guías comparan opciones, y se leen mejor con aire. */
+.md-typeset table:not([class]) {
+  font-size: 0.72rem;
+  border: 1px solid var(--nova-borde);
+}
+
+.md-typeset table:not([class]) th {
+  font-weight: 650;
+}
+
+/* Los diagramas ASCII no deben partirse nunca. */
+.md-typeset pre > code {
+  font-variant-ligatures: none;
+}
+
+/* Listas con un poco más de respiración entre puntos. */
+.md-typeset ul li,
+.md-typeset ol li {
+  margin-bottom: 0.35em;
+}
+
+/* Las tarjetas de la portada. */
+.nova-tarjetas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.9rem;
+  margin: 1.5em 0;
+}
+
+.nova-tarjeta {
+  border: 1px solid var(--nova-borde);
+  border-radius: 0.3rem;
+  padding: 0.9rem 1rem;
+  transition: border-color 120ms, transform 120ms;
+}
+
+.nova-tarjeta:hover {
+  border-color: var(--md-accent-fg-color);
+  transform: translateY(-2px);
+}
+
+.md-typeset .nova-tarjeta .nova-titulo {
+  margin: 0 0 0.4em;
+  font-size: 0.85rem;
+}
+
+.md-typeset .nova-tarjeta p {
+  margin: 0;
+  font-size: 0.73rem;
+  opacity: 0.85;
+}
+
+.md-typeset .nova-tarjeta .nova-titulo a {
+  font-size: 0.85rem;
+  opacity: 1;
+}

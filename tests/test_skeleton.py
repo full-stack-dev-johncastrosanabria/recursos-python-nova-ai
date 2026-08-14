@@ -28,8 +28,8 @@ def test_folder_name_rellena_con_cero():
 def test_render_guide_incluye_la_cabecera_fija():
     guide = render_guide(EXAMPLE)
     assert "# Módulo 05 · Testing" in guide
-    assert "**Prerrequisitos:** módulos 01–04" in guide
-    assert "**Tiempo estimado:** 90 min" in guide
+    assert "**Prerrequisitos:** módulos 01–04<br>" in guide
+    assert "**Tiempo estimado:** 90 min<br>" in guide
     assert "**Si ya dominas esto:** salta al módulo 06" in guide
 
 

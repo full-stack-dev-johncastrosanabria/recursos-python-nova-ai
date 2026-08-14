@@ -1,7 +1,7 @@
 # Módulo 07 · Datos y APIs
 
-> **Prerrequisitos:** módulos 01-06
-> **Tiempo estimado:** 150 min
+> **Prerrequisitos:** módulos 01-06<br>
+> **Tiempo estimado:** 150 min<br>
 > **Si ya dominas esto:** salta al módulo 08
 
 Este es el módulo de las fronteras: donde tu programa habla con el mundo. Datos

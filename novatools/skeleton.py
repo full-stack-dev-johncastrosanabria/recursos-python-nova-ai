@@ -41,8 +41,8 @@ def render_guide(spec: ModuleSpec) -> str:
     objectives = "\n".join(f"- {item}" for item in spec.objectives)
     return f"""# Módulo {spec.number:02d} · {spec.title}
 
-> **Prerrequisitos:** {spec.prerequisites}
-> **Tiempo estimado:** {spec.minutes} min
+> **Prerrequisitos:** {spec.prerequisites}<br>
+> **Tiempo estimado:** {spec.minutes} min<br>
 > **Si ya dominas esto:** {spec.skip_to}
 
 ## Qué vas a poder hacer al terminar

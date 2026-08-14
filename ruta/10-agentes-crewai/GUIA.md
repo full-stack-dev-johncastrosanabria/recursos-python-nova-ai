@@ -1,7 +1,7 @@
 # Módulo 10 · Agentes con CrewAI
 
-> **Prerrequisitos:** módulos 01-08, y el 09 si quieres comparar ambos enfoques
-> **Tiempo estimado:** 180 min
+> **Prerrequisitos:** módulos 01-08, y el 09 si quieres comparar ambos enfoques<br>
+> **Tiempo estimado:** 180 min<br>
 > **Si ya dominas esto:** salta al módulo 11
 
 CrewAI es el otro modelo de orquestación. Donde LangGraph piensa en máquinas de

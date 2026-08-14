@@ -10,19 +10,30 @@ theme:
   features:
     - navigation.sections
     - navigation.top
+    - navigation.tracking
+    - navigation.indexes
     - content.code.copy
+    - content.code.annotate
+    - content.action.edit
     - search.highlight
+    - search.suggest
+    - toc.follow
   palette:
     - scheme: default
       primary: indigo
+      accent: indigo
       toggle:
         icon: material/weather-night
         name: Modo oscuro
     - scheme: slate
       primary: indigo
+      accent: indigo
       toggle:
         icon: material/weather-sunny
         name: Modo claro
+
+extra_css:
+  - assets/estilos.css
 
 plugins:
   - search:
@@ -35,25 +46,40 @@ exclude_docs: |
   scripts/
   novatools/
   tests/
+  ruta/*/ejercicios/
+  ruta/*/soluciones/
+  ruta/*/tests/
 
 markdown_extensions:
   - admonition
+  - attr_list
+  - md_in_html
+  - tables
   - toc:
       permalink: true
-  - pymdownx.highlight
+      toc_depth: 3
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
   - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
 
 nav:
   - Inicio: README.md
   - Empieza aquí: EMPIEZA-AQUI.md
-  - Ruta:
+  - Fundamentos:
+      - 00 · Cómo piensa Python: ruta/00-como-piensa-python/GUIA.md
       - 01 · Fundamentos: ruta/01-fundamentos/GUIA.md
       - 02 · Estructuras de datos: ruta/02-estructuras-de-datos/GUIA.md
       - 03 · POO y módulos: ruta/03-poo-y-modulos/GUIA.md
+  - El oficio:
       - 04 · Entorno y herramientas: ruta/04-entorno-y-herramientas/GUIA.md
       - 05 · Testing: ruta/05-testing/GUIA.md
       - 06 · Async y concurrencia: ruta/06-async-y-concurrencia/GUIA.md
       - 07 · Datos y APIs: ruta/07-datos-y-apis/GUIA.md
+  - Inteligencia artificial:
       - 08 · Fundamentos de LLMs: ruta/08-llms-fundamentos/GUIA.md
       - 09 · Agentes con LangGraph: ruta/09-agentes-langgraph/GUIA.md
       - 10 · Agentes con CrewAI: ruta/10-agentes-crewai/GUIA.md
@@ -62,6 +88,9 @@ nav:
       - Enlaces: recursos/enlaces/README.md
       - General: recursos/enlaces/general.md
       - 01 · Fundamentos: recursos/enlaces/01-fundamentos.md
+      - 05 · Testing: recursos/enlaces/05-testing.md
+      - 06 · Async: recursos/enlaces/06-async.md
+      - 07 · Datos y APIs: recursos/enlaces/07-datos-y-apis.md
       - 09 · Agentes: recursos/enlaces/09-agentes.md
       - Cheatsheets: recursos/cheatsheets/README.md
       - Cheatsheet de pytest: recursos/cheatsheets/pytest.md

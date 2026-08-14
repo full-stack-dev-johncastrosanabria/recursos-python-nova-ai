@@ -1,7 +1,7 @@
 # Módulo 03 · POO y módulos
 
-> **Prerrequisitos:** módulos 01-02
-> **Tiempo estimado:** 120 min
+> **Prerrequisitos:** módulos 01-02<br>
+> **Tiempo estimado:** 120 min<br>
 > **Si ya dominas esto:** salta al módulo 04
 
 Hasta aquí has movido datos. Este módulo va de darles comportamiento y de

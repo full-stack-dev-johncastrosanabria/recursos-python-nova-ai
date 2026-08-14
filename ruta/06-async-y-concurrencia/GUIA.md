@@ -1,7 +1,7 @@
 # Módulo 06 · Async y concurrencia
 
-> **Prerrequisitos:** módulos 01-05
-> **Tiempo estimado:** 120 min
+> **Prerrequisitos:** módulos 01-05<br>
+> **Tiempo estimado:** 120 min<br>
 > **Si ya dominas esto:** salta al módulo 07
 
 La concurrencia es el tema donde más gente aplica la herramienta equivocada con

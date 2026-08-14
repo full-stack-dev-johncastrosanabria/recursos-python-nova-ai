@@ -1,7 +1,7 @@
 # Módulo 00 · Cómo piensa Python
 
-> **Prerrequisitos:** ninguno
-> **Tiempo estimado:** 90 min
+> **Prerrequisitos:** ninguno<br>
+> **Tiempo estimado:** 90 min<br>
 > **Si ya dominas esto:** salta al módulo 01
 
 Este módulo no enseña sintaxis. Enseña los cinco modelos mentales con los que

@@ -19,7 +19,14 @@ ninguna razón para abrir ninguna.
 
 - [General](general.md) — Python en general, sin tema concreto
 - [01 · Fundamentos](01-fundamentos.md)
+- [05 · Testing](05-testing.md)
+- [06 · Async y concurrencia](06-async.md)
+- [07 · Datos y APIs](07-datos-y-apis.md)
 - [09 · Agentes](09-agentes.md) — LangGraph y CrewAI
 
-¿Falta el tema que buscas? Créalo siguiendo el nombre del módulo, o abre un
-issue de tipo *proponer recurso*.
+Además, **cada guía de la ruta termina con su propia sección de Recursos**, con
+los tres o cuatro enlaces imprescindibles de ese módulo. Estos archivos son
+para lo que no cabe ahí.
+
+¿Falta el tema que buscas? Créalo siguiendo el nombre del módulo, añádelo a
+este índice, o abre un issue de tipo *proponer recurso*.

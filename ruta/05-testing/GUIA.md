@@ -1,7 +1,7 @@
 # Módulo 05 · Testing
 
-> **Prerrequisitos:** módulos 01-04
-> **Tiempo estimado:** 120 min
+> **Prerrequisitos:** módulos 01-04<br>
+> **Tiempo estimado:** 120 min<br>
 > **Si ya dominas esto:** salta al módulo 06
 
 Este módulo tiene una particularidad: **sus tests son el material didáctico**.

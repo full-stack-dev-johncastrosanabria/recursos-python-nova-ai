@@ -1,7 +1,7 @@
 # Módulo 09 · Agentes con LangGraph
 
-> **Prerrequisitos:** módulos 01-08
-> **Tiempo estimado:** 180 min
+> **Prerrequisitos:** módulos 01-08<br>
+> **Tiempo estimado:** 180 min<br>
 > **Si ya dominas esto:** salta al módulo 10
 
 En el módulo 08 el modelo te pedía llamar a una herramienta y tú se lo
