@@ -1,7 +1,7 @@
 # Módulo 09 · Agentes con LangGraph
 
 > **Prerrequisitos:** módulos 01-08<br>
-> **Tiempo estimado:** 180 min<br>
+> **Tiempo estimado:** 240 min<br>
 > **Si ya dominas esto:** salta al módulo 10
 
 En el módulo 08 el modelo te pedía llamar a una herramienta y tú se lo
@@ -14,12 +14,45 @@ LangGraph, y también cuándo el código plano del módulo 08 era suficiente.
 
 ## Qué vas a poder hacer al terminar
 
+- Elegir el patrón adecuado antes de escribir código
 - Modelar un flujo como grafo de estado
 - Definir nodos y transiciones condicionales
 - Persistir estado con checkpoints
 - Insertar un paso de human-in-the-loop
+- Gestionar la memoria de una conversación larga
+- Observar y depurar un agente en producción
 
-## 1. El bucle de agente, sin framework
+## 1. La escalera: cinco patrones antes del agente
+
+Antes de montar un agente, mira si tu problema encaja en algo más simple. Están
+ordenados de menos a más complejidad, y **casi siempre el correcto es el más
+alto de la lista que resuelva el problema**:
+
+**1. Cadena.** Pasos fijos, en orden. Extraer → clasificar → redactar. Sin
+decisiones. Es una función que llama a tres funciones.
+
+**2. Enrutamiento.** Se decide una vez a dónde va, y luego se sigue una cadena.
+La decisión puede tomarla un modelo… o unas reglas. Es el ejercicio
+`enrutador`, y su lección es que **la mitad de los enrutamientos que se
+implementan con un LLM son cuatro `if`**.
+
+**3. Paralelización.** Varias subtareas independientes a la vez, y luego se
+juntan. Es el `gather` del módulo 06, con llamadas a un modelo dentro.
+
+**4. Orquestador y trabajadores.** Un paso descompone la tarea en subtareas que
+no se conocían de antemano, otros las ejecutan, el primero integra. Aquí ya hace
+falta un modelo para decidir la descomposición.
+
+**5. Agente.** Bucle abierto: el modelo decide qué hacer a continuación, con
+herramientas, hasta que considera que terminó. Máxima capacidad y máxima
+imprevisibilidad.
+
+La pregunta que ordena todo: **¿cuántas de las decisiones de mi flujo necesitan
+juicio de verdad?** Si la respuesta es "ninguna", no necesitas un agente:
+necesitas una cadena con una o dos llamadas al modelo en los puntos donde hay
+ambigüedad real.
+
+## 2. El bucle de agente, sin framework
 
 ```python
 def run_agent(model, tools, user_message, max_steps=5):
@@ -47,7 +80,7 @@ claro y más testeable que cualquier framework. Empezar aquí y migrar cuando la
 complejidad lo justifique es casi siempre mejor que empezar con el framework y
 descubrir que peleas contra sus abstracciones.
 
-## 2. El modelo de LangGraph: un grafo de estado
+## 3. El modelo de LangGraph: un grafo de estado
 
 Cuando el flujo deja de ser lineal —hay ramas según lo que decida el modelo,
 ciclos con condiciones de salida no triviales, puntos donde tiene que aprobar
@@ -92,7 +125,7 @@ class State(TypedDict):
 Esa distinción es lo que vas a implementar en el primer ejercicio: una clave
 con reducer acumula, una clave sin reducer se sobrescribe.
 
-## 3. Nodos, aristas y transiciones condicionales
+## 4. Nodos, aristas y transiciones condicionales
 
 ```python
 from langgraph.graph import StateGraph, END
@@ -129,20 +162,51 @@ que permite que los nodos no sepan nada del resto del grafo.
 sin modelo ni red. Esa es la ventaja principal del modelo de grafo: el flujo se
 puede inspeccionar y probar en vez de emerger de una conversación.
 
-## 4. Ciclos y presupuesto
+## 5. Ciclos y presupuesto
 
 El ciclo `pensar → herramienta → pensar` es lo que hace útil a un agente, y
-también lo que puede salir caro. Dos protecciones:
+también lo que puede salir caro. Tres protecciones, y hacen falta las tres:
 
 ```python
 app.invoke(estado_inicial, {"recursion_limit": 25})
 ```
 
-Y además, una condición de salida en tu propia lógica —por número de pasos, por
-tokens gastados o por tiempo— porque el límite del framework te salva del
-bucle infinito, no de gastar veinte llamadas para algo que debía costar dos.
+Ese límite del framework te salva del bucle infinito. **No te salva de gastar
+veinte llamadas para algo que debía costar dos**, así que añade las tuyas:
 
-## 5. Checkpoints y human-in-the-loop
+- **Por pasos**, como en el bucle a mano.
+- **Por tokens gastados**, acumulando `usage` en el estado y cortando al llegar
+  al presupuesto.
+- **Por tiempo**, con el `timeout` del módulo 06.
+
+Un agente sin presupuesto es una tarjeta de crédito sin límite en manos de algo
+no determinista.
+
+## 6. Memoria: qué recuerda y cuánto cuesta
+
+El modelo no recuerda nada, así que "memoria" significa "qué le vuelvo a
+mandar". Y como el historial se reenvía entero, la memoria **es** el coste.
+
+Cuatro estrategias, de menos a más elaborada:
+
+**Ventana deslizante.** Te quedas con los últimos N mensajes. Simple y
+suficiente para conversaciones cortas. Es lo que hiciste en `mensajes`.
+
+**Resumen progresivo.** Cuando el historial pasa de un umbral, se pide al modelo
+que resuma lo viejo y se sustituye por el resumen. Conserva el hilo a cambio de
+una llamada extra y de perder detalle.
+
+**Memoria por hechos.** Se extraen datos concretos ("la cuenta del cliente es
+CR01-0002") a un almacén aparte y se inyectan cuando hacen falta. Más trabajo,
+mucho más control.
+
+**Recuperación sobre el historial.** El historial completo se indexa y se
+recuperan los fragmentos relevantes, como un RAG sobre la propia conversación.
+
+La regla práctica: empieza por la ventana. Sube de nivel cuando tengas una
+queja concreta —"se olvidó de lo que le dije al principio"— y no antes.
+
+## 7. Checkpoints y human-in-the-loop
 
 Un checkpointer guarda el estado después de cada nodo:
 
@@ -166,10 +230,35 @@ app = grafo.compile(checkpointer=MemorySaver(), interrupt_before=["transferir"])
 
 Con eso, el grafo se detiene antes de ejecutar la transferencia y espera
 aprobación. Para cualquier acción con consecuencias —mover dinero, borrar,
-enviar— ese punto de control no es opcional. Un modelo puede equivocarse; un
-modelo con permiso para transferir y sin supervisión puede equivocarse caro.
+enviar— ese punto de control no es opcional.
 
-## 6. Cuándo NO usar un framework
+Y el criterio de dónde ponerlo: **donde la acción sea irreversible**. Consultar
+un saldo no necesita aprobación; transferirlo, sí. Esa distinción es la misma
+que la del módulo 08 entre herramientas que leen y herramientas que escriben.
+
+## 8. Observar un agente en producción
+
+Un agente que falla y no deja rastro es imposible de arreglar. Lo mínimo que
+hay que registrar por ejecución:
+
+- **Cada paso**: qué herramienta pidió, con qué argumentos, qué devolvió.
+- **Los tokens** de entrada y salida acumulados, que son la factura.
+- **El motivo de terminación**: respondió, se agotó el presupuesto, falló.
+- **Un identificador de traza** que permita reconstruir la ejecución entera.
+
+Con eso puedes responder las tres preguntas que siempre se hacen: por qué
+respondió eso, cuánto costó, y en qué paso se torció.
+
+LangGraph permite además ir emitiendo los pasos intermedios según ocurren:
+
+```python
+async for evento in app.astream(estado, config):
+    logger.info("paso: %s", evento)
+```
+
+Es el generador asíncrono del módulo 06, otra vez.
+
+## 9. Cuándo NO usar un framework
 
 Sé honesto con el criterio:
 
@@ -226,38 +315,49 @@ de esto con persistencia y visualización encima.
   se reemplazan.
 - **`ejercicios/base/grafo.py`** — el ejecutor del grafo, con transiciones
   condicionales, ciclos y tope de pasos.
+- **`ejercicios/base/enrutador.py`** — enrutar por reglas antes de gastar una
+  llamada al modelo.
 - **`ejercicios/reto/ciclo.py`** — el bucle de agente completo, con un modelo
   de mentira que responde según un guion.
 
 ## Resumen
 
+- Antes del agente están la cadena, el enrutamiento, la paralelización y el
+  orquestador. Elige el más simple que resuelva el problema.
+- La mitad de los enrutamientos que se implementan con un LLM son cuatro `if`.
 - Un agente es un bucle: el modelo pide, tú ejecutas, le devuelves el
   resultado. Diecisiete líneas sin framework.
-- Todo bucle de agente lleva tope de pasos. Sin él, un modelo confundido gasta
-  hasta que alguien lo mira.
+- Todo bucle de agente lleva tope de pasos, de tokens y de tiempo.
 - Un grafo de LangGraph es un pliegue sobre un estado: nodos como transiciones
   y reducers acumulando.
-- Un nodo devuelve una **actualización**, no el estado entero; por eso los
-  nodos no necesitan conocerse.
-- Las claves con reducer acumulan; las que no tienen, se reemplazan.
+- Un nodo devuelve una **actualización**, no el estado entero.
 - La función que decide la siguiente arista es código normal y se prueba sin
   modelo ni red.
-- Los checkpoints dan continuidad entre peticiones, reanudación y el punto
-  donde para un humano. Para acciones con consecuencias, no es opcional.
+- La memoria es el coste. Empieza por la ventana deslizante y sube de nivel
+  ante una queja concreta.
+- Los checkpoints dan continuidad, reanudación y el punto donde para un humano.
+  Ese punto va donde la acción es irreversible.
+- Registra cada paso, los tokens y el motivo de terminación, o no podrás
+  arreglar nada.
 - Adopta el framework con evidencia de que se paga, no por costumbre.
-- Cada agente extra multiplica coste, latencia e imprevisibilidad.
 
 ## Preguntas de repaso
 
-1. ¿Por qué todo bucle de agente necesita un tope de pasos?
-2. Un nodo devuelve `{"messages": [uno]}`. ¿Se pierden los mensajes anteriores?
+1. Tu flujo tiene tres pasos fijos y ninguna decisión. ¿Qué patrón usas?
+2. Necesitas mandar cada correo entrante a uno de cuatro tratamientos según su
+   asunto. ¿Hace falta un modelo?
+3. ¿Por qué todo bucle de agente necesita tope, y por qué no basta con el del
+   framework?
+4. Un nodo devuelve `{"messages": [uno]}`. ¿Se pierden los mensajes anteriores?
    ¿De qué depende?
-3. ¿Qué parte de un grafo se puede probar sin modelo ni red?
-4. Tu agente puede ejecutar `transferir_dinero`. ¿Qué añades antes de
-   desplegarlo?
-5. Un flujo tiene tres pasos en cadena y ninguna rama. ¿Framework o código
-   plano?
-6. Te piden un sistema de cinco agentes. ¿Cuál es la primera pregunta que
+5. ¿Qué parte de un grafo se puede probar sin modelo ni red?
+6. Tu agente "se olvida" de lo que le dijeron al principio de una conversación
+   larga. ¿Qué estrategia de memoria pruebas primero?
+7. Tu agente puede ejecutar `transferir_dinero`. ¿Qué añades antes de
+   desplegarlo, y dónde exactamente?
+8. Un agente dio una respuesta rara en producción. ¿Qué necesitas haber
+   registrado para poder averiguar por qué?
+9. Te piden un sistema de cinco agentes. ¿Cuál es la primera pregunta que
    haces?
 
 ## Recursos
@@ -266,8 +366,8 @@ de esto con persistencia y visualización encima.
   `doc-oficial` · `en` · `intermedio`. Empieza por los tutoriales: el modelo de
   estado se entiende mejor con el código delante.
 - [Building effective agents](https://www.anthropic.com/research/building-effective-agents)
-  — `artículo` · `en` · `intermedio`. La escalera de complejidad: cadena,
-  routing, paralelo, orquestador, agente. Léelo antes de elegir.
+  — `artículo` · `en` · `intermedio`. La escalera de complejidad de la sección
+  1, contada por quienes la formalizaron. Léelo antes de elegir.
 - [Tool use en la API de Claude](https://docs.anthropic.com/es/docs/build-with-claude/tool-use)
   — `doc-oficial` · `es` · `intermedio`. El ida y vuelta, con sus formatos.
 
