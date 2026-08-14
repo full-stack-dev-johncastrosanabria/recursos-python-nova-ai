@@ -2,7 +2,7 @@
 
 Ruta de capacitación en Python para el equipo, de nivel cero a construir
 agentes con LangGraph y CrewAI. Doce módulos con guías, código que se ejecuta,
-**343 tests** que verifican tus ejercicios, y una biblioteca de enlaces
+**383 tests** que verifican tus ejercicios, y una biblioteca de enlaces
 curados.
 
 No es un catálogo de sintaxis. Cada módulo empieza por el criterio —cuándo usar
@@ -69,7 +69,7 @@ cp .env.example .env      # y pon tu clave dentro
 | # | Módulo | Qué cubre |
 |---|--------|-----------|
 | [00](ruta/00-como-piensa-python/GUIA.md) | Cómo piensa Python | los cinco modelos mentales, el Zen, protocolos |
-| [01](ruta/01-fundamentos/GUIA.md) | Fundamentos | sintaxis, tipos, control de flujo, funciones |
+| [01](ruta/01-fundamentos/GUIA.md) | Fundamentos | asignación, números y dinero, la verdad, control de flujo, funciones |
 | [02](ruta/02-estructuras-de-datos/GUIA.md) | Estructuras de datos | costes por dentro, álgebra de conjuntos, generadores |
 | [03](ruta/03-poo-y-modulos/GUIA.md) | POO y módulos | clases, dataclasses, imports y arquitectura |
 
