@@ -1,9 +1,9 @@
 # Recursos Python · Nova AI
 
 Ruta de capacitación en Python para el equipo, de nivel cero a construir
-agentes con LangGraph y CrewAI. Doce módulos con guías, código que se ejecuta,
-**383 tests** que verifican tus ejercicios, y una biblioteca de enlaces
-curados.
+agentes con LangGraph y CrewAI. **Doce módulos de 3 a 5 horas cada uno —unas 48
+en total—** con guías, código que se ejecuta, **717 tests** que verifican tus
+ejercicios, y una biblioteca de enlaces curados.
 
 No es un catálogo de sintaxis. Cada módulo empieza por el criterio —cuándo usar
 algo y cuándo no— y termina en ejercicios que fallan hasta que los resuelves.
@@ -68,27 +68,27 @@ cp .env.example .env      # y pon tu clave dentro
 
 | # | Módulo | Qué cubre |
 |---|--------|-----------|
-| [00](ruta/00-como-piensa-python/GUIA.md) | Cómo piensa Python | los cinco modelos mentales, el Zen, protocolos |
+| [00](ruta/00-como-piensa-python/GUIA.md) | Cómo piensa Python | qué es un programa, el Zen, los cinco modelos mentales |
 | [01](ruta/01-fundamentos/GUIA.md) | Fundamentos | asignación, números y dinero, la verdad, control de flujo, funciones |
-| [02](ruta/02-estructuras-de-datos/GUIA.md) | Estructuras de datos | costes por dentro, álgebra de conjuntos, generadores |
-| [03](ruta/03-poo-y-modulos/GUIA.md) | POO y módulos | clases, dataclasses, imports y arquitectura |
+| [02](ruta/02-estructuras-de-datos/GUIA.md) | Estructuras de datos | costes por dentro, matrices, álgebra de conjuntos, generadores |
+| [03](ruta/03-poo-y-modulos/GUIA.md) | POO y módulos | clases, propiedades, herencia y MRO, recursión, imports |
 
 ### El oficio
 
 | # | Módulo | Qué cubre |
 |---|--------|-----------|
-| [04](ruta/04-entorno-y-herramientas/GUIA.md) | Entorno y herramientas | uv, ruff, type hints, secretos |
-| [05](ruta/05-testing/GUIA.md) | Testing | pytest, fixtures, parametrize, la pirámide |
-| [06](ruta/06-async-y-concurrencia/GUIA.md) | Async y concurrencia | el criterio, gather, semáforos |
-| [07](ruta/07-datos-y-apis/GUIA.md) | Datos y APIs | pydantic, httpx, FastAPI, pandas |
+| [04](ruta/04-entorno-y-herramientas/GUIA.md) | Entorno y herramientas | uv, ruff, tipos, pre-commit, logging, empaquetado |
+| [05](ruta/05-testing/GUIA.md) | Testing | pytest a fondo, dobles, cobertura, property-based |
+| [06](ruta/06-async-y-concurrencia/GUIA.md) | Async y concurrencia | el GIL, hilos y procesos, TaskGroup, colas |
+| [07](ruta/07-datos-y-apis/GUIA.md) | Datos y APIs | archivos, pydantic, httpx, FastAPI, pandas |
 
 ### Inteligencia artificial
 
 | # | Módulo | Qué cubre |
 |---|--------|-----------|
-| [08](ruta/08-llms-fundamentos/GUIA.md) | Fundamentos de LLMs | tokens, prompts, tool use, RAG |
-| [09](ruta/09-agentes-langgraph/GUIA.md) | Agentes con LangGraph | grafos de estado, reducers, ciclos con tope |
-| [10](ruta/10-agentes-crewai/GUIA.md) | Agentes con CrewAI | roles, tareas encadenadas, delegación |
+| [08](ruta/08-llms-fundamentos/GUIA.md) | Fundamentos de LLMs | tokens, embeddings, prompts, tool use, RAG |
+| [09](ruta/09-agentes-langgraph/GUIA.md) | Agentes con LangGraph | los cinco patrones, grafos de estado, memoria |
+| [10](ruta/10-agentes-crewai/GUIA.md) | Agentes con CrewAI | roles, diseño de herramientas, barreras, verificación |
 | [11](ruta/11-proyecto-final/GUIA.md) | Proyecto final | un sistema completo, de punta a punta |
 
 ## Cómo funcionan los ejercicios
@@ -143,5 +143,7 @@ Doble licencia: el **código** bajo
 el **contenido** (guías, cheatsheets, listas de enlaces) bajo
 [CC BY 4.0](https://github.com/full-stack-dev-johncastrosanabria/recursos-python-nova-ai/blob/main/LICENSE-CONTENIDO).
 
-La estructura de la ruta y varios de los casos reales se apoyan en el libro
-*Python: El Lenguaje del Pensamiento* (edición 2026).
+La estructura de la ruta y varios de los casos reales se apoyan en dos libros:
+*Python: El Lenguaje del Pensamiento* (edición 2026) para el criterio de
+ingeniería y la parte de IA, y *Python Essentials 1* del OpenEDG Python
+Institute para la cobertura de fundamentos.
