@@ -1,7 +1,7 @@
 # Módulo 02 · Estructuras de datos
 
 > **Prerrequisitos:** módulo 01<br>
-> **Tiempo estimado:** 120 min<br>
+> **Tiempo estimado:** 240 min<br>
 > **Si ya dominas esto:** salta al módulo 03
 
 Cuatro estructuras integradas —`list`, `tuple`, `dict`, `set`— cubren el 95% de
@@ -14,11 +14,102 @@ misteriosamente a las diez mil iteraciones.
 
 ## Qué vas a poder hacer al terminar
 
+- Crear, indexar y modificar listas con sus métodos
+- Distinguir un método de una función y saber por qué importa
 - Elegir entre list, dict, set y tuple según el caso
+- Predecir el coste de una operación a partir de su implementación
+- Trabajar con listas de listas sin caer en la trampa de la copia
 - Escribir list comprehensions legibles
 - Usar generadores para no cargar todo en memoria
 
-## 1. La lista por dentro: un array, no una lista enlazada
+## 1. Crear una lista y acceder a ella
+
+Una lista es una colección **ordenada** y **mutable** que puede contener
+cualquier cosa, incluso cosas de tipos distintos:
+
+```python
+vacia = []
+numeros = [10, 20, 30, 40, 50]
+mezclada = [1, "dos", 3.0, True, None]
+```
+
+Se accede por **índice**, y el primero es el **cero**:
+
+```python
+numeros[0]     # 10   el primero
+numeros[4]     # 50   el último de cinco
+numeros[5]     # IndexError: list index out of range
+```
+
+Y también desde el final, con índices negativos:
+
+```python
+numeros[-1]    # 50   el último, sin tener que saber cuántos hay
+numeros[-2]    # 40   el penúltimo
+```
+
+`numeros[-1]` es siempre mejor que `numeros[len(numeros) - 1]`: dice lo mismo,
+más corto y sin posibilidad de equivocarse en el uno.
+
+Como son mutables, se puede asignar a una posición:
+
+```python
+numeros[0] = 99          # [99, 20, 30, 40, 50]
+del numeros[0]           # [20, 30, 40, 50]   ← borra ese elemento
+```
+
+## 2. Métodos frente a funciones
+
+Esta distinción confunde al principio y conviene fijarla:
+
+```python
+len(numeros)             # FUNCIÓN: se le pasa el objeto
+numeros.append(60)       # MÉTODO: pertenece al objeto, se invoca sobre él
+```
+
+Una **función** existe por su cuenta y recibe datos. Un **método** pertenece a
+un tipo y actúa sobre la instancia desde la que lo llamas. La sintaxis lo hace
+evidente: `funcion(objeto)` frente a `objeto.metodo()`.
+
+No es un detalle académico: explica por qué `len(lista)` y no `lista.len()`,
+y por qué el autocompletado del editor te muestra cosas distintas al escribir
+`lista.` que al empezar una línea en blanco.
+
+### Los métodos de lista que usarás
+
+```python
+refs = ["TR-002", "TR-001"]
+
+refs.append("TR-003")        # añade al final          → ['TR-002','TR-001','TR-003']
+refs.insert(0, "TR-000")     # inserta en una posición → ['TR-000','TR-002',...]
+refs.remove("TR-002")        # borra la primera aparición por VALOR
+refs.pop()                   # saca y devuelve el último
+refs.pop(0)                  # saca y devuelve el de esa posición
+refs.index("TR-001")         # en qué posición está (ValueError si no está)
+refs.count("TR-001")         # cuántas veces aparece
+refs.sort()                  # ordena EN EL SITIO, devuelve None
+refs.reverse()               # invierte EN EL SITIO
+refs.clear()                 # vacía
+copia = refs.copy()          # copia superficial (equivale a refs[:])
+```
+
+Dos trampas clásicas con estos métodos:
+
+**`sort()` y `reverse()` devuelven `None`.** Modifican la lista y no devuelven
+nada. `refs = refs.sort()` deja `refs` valiendo `None`, y el bug aparece tres
+líneas más abajo.
+
+```python
+refs.sort()              # correcto: muta
+ordenadas = sorted(refs) # correcto: crea una nueva y no toca refs
+refs = refs.sort()       # ← BUG: refs pasa a ser None
+```
+
+**`remove` borra por valor, `pop` y `del` por posición.** Confundirlos con una
+lista de números es especialmente fácil: `lista.remove(2)` borra el *valor* 2;
+`lista.pop(2)` saca el elemento de la *posición* 2.
+
+## 3. La lista por dentro: un array, no una lista enlazada
 
 El nombre engaña a quien viene de estructuras de datos clásicas. La `list` de
 Python **no** es una lista enlazada: es un array dinámico, un bloque contiguo de
@@ -43,6 +134,7 @@ De ese dibujo se deduce la tabla de costes entera, sin memorizarla:
 | `lst.pop()` | O(1) | quita la última referencia |
 | `lst.pop(0)`, `lst.insert(0, x)` | **O(n)** | desplaza *todas* las referencias |
 | `x in lst` | O(n) | búsqueda lineal: no hay índice por valor |
+| `lst.remove(x)` | O(n) | búsqueda lineal más desplazamiento |
 | `lst[a:b]` | O(b−a) | copia ese rango de referencias |
 | `lst.sort()` | O(n log n) | Timsort |
 | `len(lst)` | O(1) | la longitud se guarda, no se cuenta |
@@ -83,7 +175,7 @@ código caliente.
 Detrás hay un principio que gobierna todo el módulo: **elegir estructura es
 elegir qué patrón de acceso va a ser O(1)**.
 
-## 2. Slicing: el álgebra de las secuencias
+## 4. Slicing: el álgebra de las secuencias
 
 ```python
 data = [10, 20, 30, 40, 50, 60]
@@ -100,7 +192,14 @@ Que el final sea exclusivo no es un capricho: hace que `len(data[a:b]) == b - a`
 que `data[:k] + data[k:]` reconstruya el original exacto y que la rebanada vacía
 se represente sin casos especiales.
 
-Y ojo con estos dos, que se parecen y no son lo mismo:
+El slicing también **asigna** y **borra**:
+
+```python
+data[1:3] = [99]         # reemplaza un rango por otro, de distinto tamaño
+del data[::2]            # borra por rebanada
+```
+
+Y ojo con estos tres, que se parecen y no son lo mismo:
 
 ```python
 copia = data[:]        # copia superficial: objeto NUEVO
@@ -110,7 +209,103 @@ data = new_values      # solo re-vincula ESTE nombre
 
 Es el modelo de etiquetas del módulo 00 otra vez, ahora con sintaxis.
 
-## 3. Tuplas: registros, no listas de solo lectura
+## 5. Ordenar: Timsort, `key` y la estabilidad
+
+### Primero, hazlo a mano una vez
+
+Antes de usar `sorted()`, conviene haber escrito un ordenamiento. El más simple
+es el **de burbuja**: recorrer la lista comparando pares vecinos e
+intercambiándolos si están desordenados, repitiendo hasta que una pasada
+completa no haga ningún intercambio.
+
+```text
+[8, 3, 5]  → compara 8 y 3 → intercambia → [3, 8, 5]
+           → compara 8 y 5 → intercambia → [3, 5, 8]
+           → segunda pasada sin intercambios → ordenada
+```
+
+Es O(n²) y para nada lo usarías en producción. Pero escribirlo tiene dos
+retornos: entiendes qué significa "ordenar" en términos de comparaciones e
+intercambios, y entiendes por qué existe `sorted()`. Es tu ejercicio `burbuja`.
+
+### Y ahora usa el de verdad
+
+Python ordena con **Timsort**, que tiene tres propiedades de contrato:
+O(n log n) en el peor caso, **O(n) sobre datos ya casi ordenados** (el caso más
+frecuente de la vida real: logs por fecha, exports de base de datos) y
+**estabilidad** — los elementos iguales conservan su orden relativo.
+
+```python
+orders.sort()     # muta la lista y devuelve None
+sorted(orders)    # devuelve una lista nueva y acepta cualquier iterable
+```
+
+La pieza profesional es `key`: una función que extrae de cada elemento el valor
+por el que ordenar. Se llama una sola vez por elemento.
+
+```python
+from operator import attrgetter, itemgetter
+
+transfers.sort(key=lambda t: t.amount_cents)
+transfers.sort(key=attrgetter("currency", "amount_cents"))  # multiclave sin lambda
+rows.sort(key=itemgetter(2))                                # por columna
+names.sort(key=str.casefold)                                # orden correcto sin mayúsculas
+```
+
+Y un idioma que solo funciona *porque* Timsort es estable: para ordenar por
+varios criterios con direcciones distintas, se ordena en pasadas sucesivas, de
+la clave menos importante a la más importante.
+
+```python
+transfers.sort(key=attrgetter("amount_cents"), reverse=True)  # criterio secundario
+transfers.sort(key=attrgetter("currency"))                    # criterio principal
+# resultado: por divisa ascendente y, dentro de cada divisa, por monto descendente
+```
+
+## 6. Listas de listas: matrices y la trampa de la copia
+
+Una lista puede contener listas, y así se representa una tabla:
+
+```python
+matriz = [
+    [1, 2, 3],
+    [4, 5, 6],
+]
+
+matriz[0]        # [1, 2, 3]   — la primera fila
+matriz[0][2]     # 3           — fila 0, columna 2
+len(matriz)      # 2           — número de filas
+len(matriz[0])   # 3           — número de columnas
+```
+
+Construirlas con comprehensions:
+
+```python
+ceros = [[0] * 3 for _ in range(2)]     # [[0,0,0], [0,0,0]]
+```
+
+Y aquí está **la trampa que hay que ver una vez en la vida**:
+
+```python
+mal = [[0] * 3] * 2      # parece lo mismo…
+mal[0][0] = 9
+mal                      # [[9, 0, 0], [9, 0, 0]]  ← ¡las dos filas!
+```
+
+El `* 2` no copia la lista interior: repite **la misma referencia** dos veces.
+Es el modelo de etiquetas del módulo 00, en su versión más dolorosa. La forma
+correcta es la comprehension, que evalúa `[0] * 3` una vez por fila.
+
+Recorrer una matriz es un bucle dentro de otro:
+
+```python
+for fila in matriz:
+    for valor in fila:
+        print(valor, end=" ")
+    print()
+```
+
+## 7. Tuplas: registros, no listas de solo lectura
 
 Presentar la tupla como "una lista que no cambia" pierde su significado. La
 distinción que practica la comunidad:
@@ -166,44 +361,36 @@ origin, dest, cents, cur = t      # sigue desempaquetando
 Elegir el peldaño según cuánta estructura pide el dato es una micro-decisión de
 diseño que un revisor con experiencia nota enseguida.
 
-## 4. Ordenar: Timsort, `key` y la estabilidad
+## 8. Diccionarios con criterio
 
-Python ordena con Timsort, que tiene tres propiedades de contrato: O(n log n) en
-el peor caso, **O(n) sobre datos ya casi ordenados** (el caso más frecuente de
-la vida real: logs por fecha, exports de base de datos) y **estabilidad** — los
-elementos iguales conservan su orden relativo.
-
-```python
-orders.sort()     # muta la lista y devuelve None
-sorted(orders)    # devuelve una lista nueva y acepta cualquier iterable
-```
-
-La pieza profesional es `key`: una función que extrae de cada elemento el valor
-por el que ordenar. Se llama una sola vez por elemento.
+Un `dict` asocia **claves** con **valores**. Las claves tienen que ser
+hashables (inmutables, en la práctica) y son únicas; los valores, cualquier
+cosa.
 
 ```python
-from operator import attrgetter, itemgetter
+precios = {"café": 3_500, "azúcar": 990}
 
-transfers.sort(key=lambda t: t.amount_cents)
-transfers.sort(key=attrgetter("currency", "amount_cents"))  # multiclave sin lambda
-rows.sort(key=itemgetter(2))                                # por columna
-names.sort(key=str.casefold)                                # orden correcto sin mayúsculas
+precios["café"]              # 3500
+precios["té"] = 2_100        # añade
+precios["café"] = 3_800      # sobrescribe
+del precios["azúcar"]        # borra
+"café" in precios            # True — comprueba CLAVES, no valores
+len(precios)                 # cuántos pares hay
 ```
 
-Y un idioma que solo funciona *porque* Timsort es estable: para ordenar por
-varios criterios con direcciones distintas, se ordena en pasadas sucesivas, de
-la clave menos importante a la más importante.
+Y se recorre de tres maneras, según qué necesites:
 
 ```python
-transfers.sort(key=attrgetter("amount_cents"), reverse=True)  # criterio secundario
-transfers.sort(key=attrgetter("currency"))                    # criterio principal
-# resultado: por divisa ascendente y, dentro de cada divisa, por monto descendente
+for clave in precios: ...                    # las claves (lo que da `in`)
+for valor in precios.values(): ...           # los valores
+for clave, valor in precios.items(): ...     # los dos, desempaquetados
 ```
 
-## 5. Diccionarios con criterio
+Desde Python 3.7, un `dict` **conserva el orden de inserción**. Es una garantía
+del lenguaje, no un detalle de implementación, y de ella salen idiomas como
+deduplicar conservando el orden.
 
-La diferencia entre usar dicts y dominarlos está en un puñado de métodos que
-codifican patrones enteros.
+### La tríada de lectura
 
 ```python
 config = {"host": "db.internal", "port": 5432}
@@ -218,10 +405,10 @@ defaults | file_cfg | cli_args     # dict nuevo; a igual clave gana la derecha
 dict(zip(headers, row))            # dos secuencias paralelas → dict
 ```
 
-Elegir dentro de esa tríada de lectura es **semántico, no estilístico**.
-`d[k]` afirma "esta clave tiene que estar; si no, quiero el error ahora mismo".
-`.get` afirma "que falte es un caso normal del dominio". Usar `.get` por reflejo
-convierte bugs de datos en `None` que viajan tres capas y estallan como un
+Elegir dentro de esa tríada es **semántico, no estilístico**. `d[k]` afirma
+"esta clave tiene que estar; si no, quiero el error ahora mismo". `.get` afirma
+"que falte es un caso normal del dominio". Usar `.get` por reflejo convierte
+bugs de datos en `None` que viajan tres capas y estallan como un
 `AttributeError` incomprensible.
 
 Las vistas (`keys()`, `values()`, `items()`) no son listas: son ventanas vivas
@@ -248,7 +435,7 @@ levels = Counter(entry.level for entry in logs)
 levels.most_common(3)                     # [('INFO', 8412), ('WARN', 312), ...]
 ```
 
-## 6. Conjuntos: la matemática que borra bucles
+## 9. Conjuntos: la matemática que borra bucles
 
 Un `set` es la misma tabla hash del dict sin la columna de valores: pertenencia,
 inserción y borrado O(1) de media, elementos únicos, sin orden garantizado.
@@ -282,7 +469,7 @@ orden ni rangos. Acceso por identidad exacta → hash. Acceso por rango u orden 
 secuencia ordenada. Las dos cosas a escala → eso ya es un índice de base de
 datos.
 
-## 7. Comprehensions y generadores
+## 10. Comprehensions y generadores
 
 Una comprehension comunica *qué* quieres; un bucle comunica *cómo* lo obtienes.
 
@@ -374,23 +561,37 @@ las tres secciones del informe que recibe el equipo. Ese es el ejercicio
 uv run pytest ruta/02-estructuras-de-datos
 ```
 
+- **`ejercicios/base/listas.py`** — los métodos de lista, incluidas las dos
+  trampas: `sort()` que devuelve `None` y `remove` que borra por valor.
 - **`ejercicios/base/conciliacion.py`** — el caso real de arriba, con álgebra de
   conjuntos.
 - **`ejercicios/base/agrupar.py`** — agrupar registros por una clave sin el
   ritual de "si no está, créala".
+- **`ejercicios/reto/burbuja.py`** — ordenar a mano, una vez, para entender qué
+  te ahorra `sorted()`.
+- **`ejercicios/reto/matriz.py`** — listas de listas, incluida la trampa de la
+  fila compartida.
 - **`ejercicios/reto/flujo.py`** — un generador que trocea cualquier iterable
   sin materializarlo. Aquí se comprueba si entendiste la pereza.
 
 ## Resumen
 
+- Las listas se indexan desde 0, y desde el final con negativos. `lst[-1]` es
+  mejor que `lst[len(lst) - 1]`.
+- `len(x)` es una función; `x.append(y)` es un método. La sintaxis lo delata.
+- `sort()` y `reverse()` mutan y devuelven `None`. `sorted()` devuelve una nueva.
+- `remove` borra por valor; `pop` y `del`, por posición.
 - La `list` es un array dinámico: índice y `append` son O(1); `pop(0)` es O(n).
   Para cola, `deque`.
 - Elegir estructura es elegir qué acceso será O(1).
-- El slicing tiene el final exclusivo por razones de álgebra, no de gusto.
-  `data[:] = x` muta; `data = x` re-vincula.
-- La tupla es un registro de longitud fija, no una lista congelada. Sube por la
-  escalera tupla → NamedTuple → dataclass → modelo validado según haga falta.
-- Timsort es estable, y esa garantía habilita el idioma de ordenar en pasadas.
+- El slicing tiene el final exclusivo por razones de álgebra. `data[:] = x`
+  muta; `data = x` re-vincula.
+- `[[0] * 3] * 2` repite la misma referencia: usa una comprehension para las
+  matrices.
+- Escribe una burbuja una vez; usa Timsort siempre. Es estable, y esa garantía
+  habilita el idioma de ordenar en pasadas.
+- La tupla es un registro de longitud fija, no una lista congelada.
+- Un `dict` conserva el orden de inserción desde 3.7, y eso es una garantía.
 - `d[k]` frente a `.get(k)` es una decisión semántica: ¿faltar es un bug o es
   parte del dominio?
 - Los conjuntos convierten bucles en álgebra. Si el problema se deja escribir
@@ -399,18 +600,23 @@ uv run pytest ruta/02-estructuras-de-datos
 
 ## Preguntas de repaso
 
-1. Tienes una lista de un millón de elementos y necesitas ir sacando del
+1. ¿Qué diferencia hay entre `lista.remove(2)` y `lista.pop(2)`?
+2. `refs = refs.sort()`. ¿Qué vale `refs` después, y por qué?
+3. Tienes una lista de un millón de elementos y necesitas ir sacando del
    principio. ¿Qué pasa y qué usarías?
-2. `data[:] = otra` y `data = otra`. ¿En qué se diferencian para alguien que
+4. `data[:] = otra` y `data = otra`. ¿En qué se diferencian para alguien que
    tenga otro nombre apuntando a `data`?
-3. ¿Por qué `(1)` no es una tupla y `(1,)` sí?
-4. Necesitas ordenar por divisa ascendente y, dentro de cada divisa, por monto
+5. ¿Por qué `[[0] * 3] * 2` no sirve para crear una matriz?
+6. ¿Por qué `(1)` no es una tupla y `(1,)` sí?
+7. Necesitas ordenar por divisa ascendente y, dentro de cada divisa, por monto
    descendente. ¿Cómo lo consigues y qué propiedad de Timsort lo permite?
-5. ¿Cuándo es un error usar `.get()` en lugar de `d[clave]`?
-6. Escribe en una línea "las referencias que están en el banco pero no en los
+8. ¿Cuándo es un error usar `.get()` en lugar de `d[clave]`?
+9. Escribe en una línea "las referencias que están en el banco pero no en los
    registros internos".
-7. `sum([x * 2 for x in datos])` y `sum(x * 2 for x in datos)` dan el mismo
-   número. ¿En qué se diferencian con diez millones de datos?
+10. ¿Por qué borrar claves mientras recorres un diccionario da error, y cómo se
+    arregla?
+11. `sum([x * 2 for x in datos])` y `sum(x * 2 for x in datos)` dan el mismo
+    número. ¿En qué se diferencian con diez millones de datos?
 
 ## Recursos
 
@@ -422,6 +628,9 @@ uv run pytest ruta/02-estructuras-de-datos
   de cada estructura. Consulta obligada cuando algo va lento.
 - [`collections` — la documentación del módulo](https://docs.python.org/es/3/library/collections.html)
   — `doc-oficial` · `es` · `intermedio`. `deque`, `defaultdict`, `Counter`.
+- [Sorting HOW TO](https://docs.python.org/es/3/howto/sorting.html) —
+  `doc-oficial` · `es` · `intermedio`. Todo sobre `key`, `reverse` y la
+  estabilidad, con ejemplos.
 
 ## Siguiente
 
