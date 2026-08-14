@@ -54,6 +54,11 @@ def render_guide(spec: ModuleSpec) -> str:
 Este módulo todavía no está escrito. El módulo 01 es la plantilla viva: copia
 su estructura. Si quieres escribir este, lee `CONTRIBUTING.md`.
 
+## Caso real
+
+Pendiente: un problema concreto donde lo del módulo se usa de verdad, con el
+error que se comete cuando no se entiende.
+
 ## Ejercicios
 
 - `ejercicios/base/` — para consolidar lo del módulo.
@@ -64,6 +69,23 @@ Para ver tu progreso:
 ```bash
 uv run pytest ruta/{folder_name(spec)}
 ```
+
+## Resumen
+
+Pendiente: las ideas del módulo en una lista que se pueda releer en un minuto.
+
+## Preguntas de repaso
+
+Pendiente: preguntas que se responden con criterio, no de memoria.
+
+## Recursos
+
+Pendiente: enlaces para profundizar. Los curados por tema viven en
+`recursos/enlaces/`.
+
+## Siguiente
+
+{spec.skip_to.capitalize()}.
 """
 
 

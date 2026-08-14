@@ -39,6 +39,22 @@ def test_render_guide_lista_los_objetivos():
     assert "- Usar fixtures" in guide
 
 
+def test_render_guide_trae_todas_las_secciones_de_la_anatomia():
+    """Toda guía comparte la misma anatomía, la escriba quien la escriba."""
+    guide = render_guide(EXAMPLE)
+    for section in (
+        "## Qué vas a poder hacer al terminar",
+        "## Contenido",
+        "## Caso real",
+        "## Ejercicios",
+        "## Resumen",
+        "## Preguntas de repaso",
+        "## Recursos",
+        "## Siguiente",
+    ):
+        assert section in guide, f"falta la sección {section}"
+
+
 def test_create_module_crea_todas_las_subcarpetas(tmp_path):
     module_dir = create_module(tmp_path, EXAMPLE)
 
