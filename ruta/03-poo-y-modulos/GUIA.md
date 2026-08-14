@@ -1,7 +1,7 @@
 # Módulo 03 · POO y módulos
 
 > **Prerrequisitos:** módulos 01-02<br>
-> **Tiempo estimado:** 120 min<br>
+> **Tiempo estimado:** 240 min<br>
 > **Si ya dominas esto:** salta al módulo 04
 
 Hasta aquí has movido datos. Este módulo va de darles comportamiento y de
@@ -14,6 +14,12 @@ piezas, y los módulos deciden quién puede ver a quién.
 ## Qué vas a poder hacer al terminar
 
 - Definir clases con estado y comportamiento
+- Elegir entre método de instancia, de clase y estático
+- Encapsular con propiedades en vez de getters y setters
+- Usar herencia cuando toca, y composición cuando toca más
+- Leer un MRO y saber por qué existe
+- Definir contratos con ABCs y con Protocol
+- Escribir funciones recursivas sobre estructuras anidadas
 - Usar dataclasses para estructuras de datos
 - Organizar código en módulos y paquetes
 
@@ -46,20 +52,53 @@ programador en vez de poner barandillas. Suena ingenuo hasta que llevas un
 tiempo: los lenguajes con `private` estricto acaban llenos de getters y setters
 que no protegen nada.
 
+Existe además el **doble** guion bajo (`__saldo`), que activa el *name
+mangling*: el atributo pasa a llamarse `_Account__saldo` por dentro. No es
+privacidad, es evitar colisiones accidentales en jerarquías de herencia. Se usa
+poco y con criterio.
+
 ### Dinero: nunca en `float`
 
 Fíjate en `balance_cents`. `0.1 + 0.2` no vale `0.3` en ningún lenguaje que use
-IEEE 754, Python incluido:
+IEEE 754, Python incluido. Para dinero: enteros de la unidad mínima o
+`decimal.Decimal`. Nunca `float`. Es de los errores que más caro salen y de los
+más fáciles de evitar.
+
+## 2. Tres clases de método
 
 ```python
->>> 0.1 + 0.2
-0.30000000000000004
+class Transfer:
+    MONTO_MAXIMO = 10_000_000          # atributo de clase: uno para todas
+
+    def __init__(self, origin: str, amount_cents: int) -> None:
+        self.origin = origin
+        self.amount_cents = amount_cents
+
+    def describe(self) -> str:                    # de INSTANCIA
+        return f"{self.origin}: {self.amount_cents}"
+
+    @classmethod
+    def from_dict(cls, payload: dict) -> "Transfer":   # de CLASE
+        return cls(payload["origin"], payload["amount_cents"])
+
+    @staticmethod
+    def is_valid_amount(cents: int) -> bool:      # ESTÁTICO
+        return 0 < cents <= Transfer.MONTO_MAXIMO
 ```
 
-Para dinero: enteros de la unidad mínima (céntimos) o `decimal.Decimal`. Nunca
-`float`. Es de los errores que más caro salen y de los más fáciles de evitar.
+- **De instancia**: recibe `self`. Necesita los datos de *este* objeto. Es el
+  caso normal.
+- **De clase**: recibe `cls`, la clase misma. El uso canónico es el
+  **constructor alternativo**: `Transfer.from_dict(payload)`. Y como recibe
+  `cls` y no `Transfer` a pelo, funciona bien con herencia — una subclase
+  obtiene instancias de la subclase, no de la base.
+- **Estático**: no recibe nada especial. Es una función normal que vive dentro
+  de la clase porque conceptualmente pertenece ahí.
 
-## 2. Los atributos viven en diccionarios
+Si un método estático no usa nada de la clase, plantéate si no debería ser una
+función del módulo. A veces sí (agrupa bien); a veces es una función disfrazada.
+
+## 3. Los atributos viven en diccionarios
 
 Cuando escribes `cuenta.holder`, Python busca en `cuenta.__dict__`, luego en
 `Account.__dict__`, luego en sus clases base. Es el modelo mental 5 del módulo
@@ -88,13 +127,57 @@ b.items                 # ['pan']  ← el carrito de a
 Es el mismo bug del argumento mutable por defecto del módulo 00, con otro
 disfraz. La cura es la misma: crear el objeto por instancia, en `__init__`.
 
-## 3. Dataclasses: declarar en vez de ceremoniar
+## 4. Propiedades: encapsular sin ceremonia
+
+En muchos lenguajes, exponer un atributo público es un compromiso irreversible:
+si mañana necesitas validar, tienes que cambiar la API a `getSaldo()` y romper a
+todo el mundo. En Python no:
+
+```python
+class Account:
+    def __init__(self, balance_cents: int = 0) -> None:
+        self._balance_cents = balance_cents
+
+    @property
+    def balance_cents(self) -> int:
+        return self._balance_cents
+
+    @balance_cents.setter
+    def balance_cents(self, value: int) -> None:
+        if value < 0:
+            raise ValueError(f"el saldo no puede ser negativo: {value}")
+        self._balance_cents = value
+
+cuenta = Account()
+cuenta.balance_cents = 500      # pasa por el setter y valida
+cuenta.balance_cents            # pasa por el getter
+cuenta.balance_cents = -1       # ValueError
+```
+
+Quien usa la clase escribe `cuenta.balance_cents` exactamente igual que antes.
+La propiedad convierte un atributo en un par de métodos **sin cambiar la
+sintaxis de uso**.
+
+De ahí la regla cultural: **empieza con un atributo público normal**. Si algún
+día necesitas validar o calcular, lo conviertes en propiedad y nadie se entera.
+Escribir getters y setters "por si acaso", como en Java, es ceremonia que en
+Python no compra nada.
+
+Las propiedades también sirven para **valores derivados**:
+
+```python
+@property
+def amount(self) -> float:
+    return self.amount_cents / 100      # se lee como dato, se calcula al vuelo
+```
+
+## 5. Dataclasses: declarar en vez de ceremoniar
 
 Muchas clases existen solo para agrupar datos. Escribir a mano su `__init__`,
 su `__repr__` y su `__eq__` es ceremonia repetitiva y una fuente de bugs.
 
 ```python
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 @dataclass(frozen=True, slots=True)
 class Transfer:
@@ -102,6 +185,7 @@ class Transfer:
     destination: str
     amount_cents: int
     currency: str = "CRC"
+    tags: list[str] = field(default_factory=list)   # mutable: SIEMPRE así
 
     def __post_init__(self) -> None:
         if self.amount_cents <= 0:
@@ -112,7 +196,7 @@ t                       # Transfer(origin='CR01-0001', ..., currency='CRC')
 t == Transfer("CR01-0001", "CR01-0002", 1_500_000)   # True: compara por valor
 ```
 
-Tres parámetros que conviene entender, no copiar:
+Cuatro piezas que conviene entender, no copiar:
 
 - **`frozen=True`** hace la instancia inmutable. Ganas hashabilidad (sirve de
   clave de dict, entra en un `set`) y la tranquilidad de que nadie la modifica
@@ -120,6 +204,9 @@ Tres parámetros que conviene entender, no copiar:
   viajan.
 - **`slots=True`** cambia el `__dict__` por ranuras fijas: menos memoria y
   acceso más rápido, a cambio de no poder añadir atributos nuevos al vuelo.
+- **`field(default_factory=list)`** es la forma correcta de dar un valor por
+  defecto mutable. Poner `tags: list = []` directamente da error, precisamente
+  porque el lenguaje aprendió del bug del argumento mutable.
 - **`__post_init__`** es donde valida un dataclass. Sin él, `frozen` te protege
   de cambios pero no de nacer mal.
 
@@ -129,7 +216,7 @@ comportamiento propio. El siguiente, Pydantic, lo verás en el módulo 07: es lo
 que se usa en la *frontera* del sistema, donde los datos llegan de fuera y no
 te puedes fiar.
 
-## 4. Los protocolos, ahora en tus clases
+## 6. Los protocolos, ahora en tus clases
 
 El módulo 00 decía que tus tipos se integran con el lenguaje hablando
 `__dunder__`. Aquí lo aplicas:
@@ -143,12 +230,18 @@ class Money:
     def __repr__(self) -> str:
         return f"Money({self.cents}, {self.currency!r})"
 
+    def __str__(self) -> str:
+        return f"{self.cents / 100:,.2f} {self.currency}"
+
     def __eq__(self, other) -> bool:
         if not isinstance(other, Money):
             return NotImplemented
         return (self.cents, self.currency) == (other.cents, other.currency)
 
-    def __lt__(self, other) -> bool:
+    def __hash__(self) -> int:
+        return hash((self.cents, self.currency))
+
+    def __lt__(self, other):
         if not isinstance(other, Money) or other.currency != self.currency:
             return NotImplemented
         return self.cents < other.cents
@@ -159,17 +252,67 @@ class Money:
         return Money(self.cents + other.cents, self.currency)
 ```
 
-Con esos cuatro métodos, `Money` ya funciona con `==`, `sorted()`, `min()`,
-`max()` y `+`. No heredó de nada: habla los protocolos.
+Con esos métodos, `Money` ya funciona con `==`, `sorted()`, `min()`, `max()` y
+`+`. No heredó de nada: habla los protocolos.
 
-Devolver `NotImplemented` (que no es `NotImplementedError`) es la forma
+Tres detalles que separan una implementación correcta de una aproximada:
+
+**`__repr__` frente a `__str__`.** El primero es para quien programa —debería
+poder pegarse en un intérprete y reconstruir el objeto— y el segundo para quien
+lee la salida. Si solo defines uno, que sea `__repr__`: `str()` cae en él
+cuando no hay `__str__`.
+
+**Devolver `NotImplemented`** (que no es `NotImplementedError`) es la forma
 correcta de decir "yo no sé comparar con eso": Python entonces le pregunta al
-otro operando, y si tampoco sabe, lanza `TypeError` con un mensaje claro.
+otro operando, y si tampoco sabe, lanza `TypeError` con un mensaje claro. Es lo
+que hace que `==` con algo raro dé `False` mientras `<` levanta `TypeError`.
 
-## 5. Herencia y composición
+**Definir `__eq__` borra el `__hash__` heredado.** Si tu objeto es inmutable de
+hecho, defínelo tú; si no, quedará como no hashable y no entrará en un `set`.
 
-La herencia sirve para *es un*: `AdminUser` es un `User`. La composición sirve
-para *tiene un*, y en la práctica se necesita mucho más.
+## 7. Herencia, `super()` y el MRO
+
+La herencia sirve para *es un*: `AdminUser` es un `User`.
+
+```python
+class Account:
+    def __init__(self, holder: str, balance_cents: int = 0) -> None:
+        self.holder = holder
+        self.balance_cents = balance_cents
+
+    def describe(self) -> str:
+        return f"{self.holder}: {self.balance_cents}"
+
+
+class SavingsAccount(Account):
+    def __init__(self, holder: str, balance_cents: int = 0, rate: float = 0.02):
+        super().__init__(holder, balance_cents)     # ← inicializa la parte de arriba
+        self.rate = rate
+
+    def describe(self) -> str:
+        return f"{super().describe()} (ahorro al {self.rate:.1%})"
+```
+
+`super()` no significa "la clase padre": significa "el siguiente en el orden de
+resolución". Con herencia simple coinciden; con múltiple, no, y la diferencia
+importa.
+
+### El MRO
+
+Cuando hay varias clases base, el orden en que Python busca un método se llama
+**MRO** (*Method Resolution Order*) y **se consulta, no se adivina**:
+
+```python
+SavingsAccount.__mro__
+# (SavingsAccount, Account, object)
+```
+
+La regla que aplica Python (linearización C3) garantiza que una clase siempre
+aparece antes que sus bases y que se respeta el orden en que las declaraste. La
+consecuencia práctica: si necesitas dibujar tu jerarquía en una pizarra para
+entender de dónde sale un método, **la jerarquía está mal**.
+
+### Herencia frente a composición
 
 ```python
 # Herencia: frágil si se usa para reutilizar código
@@ -182,15 +325,83 @@ class Report:
         self._logger = logger
 ```
 
-La regla práctica: hereda cuando el subtipo pueda sustituir al padre en
-cualquier sitio sin sorpresas. Si heredas solo para no repetir código, casi
-siempre querías composición.
+La regla práctica: hereda cuando el subtipo pueda **sustituir** al padre en
+cualquier sitio sin sorpresas (es el principio de sustitución de Liskov). Si
+heredas solo para no repetir código, casi siempre querías composición.
 
-Cuando hay herencia múltiple, el orden en que Python busca los métodos se llama
-**MRO** y se consulta, no se adivina: `Clase.__mro__`. Si necesitas dibujarlo
-en una pizarra para entender tu propia jerarquía, la jerarquía está mal.
+Y la pregunta que lo resuelve casi siempre: ¿mi clase **es un** X, o **tiene un**
+X? Un `ReportWithCache` no es un tipo distinto de informe: es un informe que
+tiene una caché.
 
-## 6. Qué pasa exactamente en un `import`
+## 8. Contratos explícitos: ABC y Protocol
+
+Duck typing dice "si sabe hacerlo, sirve". A veces quieres declarar el contrato:
+
+```python
+from abc import ABC, abstractmethod
+
+class Repository(ABC):
+    @abstractmethod
+    def get(self, ref: str) -> dict | None: ...
+
+    @abstractmethod
+    def save(self, item: dict) -> None: ...
+
+class InMemoryRepository(Repository):
+    ...    # si olvidas implementar un abstractmethod, falla al instanciar
+```
+
+Una **ABC** es herencia nominal: hay que heredar de ella explícitamente. Da
+garantías fuertes (no puedes instanciar una implementación incompleta) al precio
+de acoplar tus clases a la jerarquía.
+
+La alternativa moderna es **`Protocol`**, que es duck typing verificable:
+
+```python
+from typing import Protocol
+
+class Repository(Protocol):
+    def get(self, ref: str) -> dict | None: ...
+    def save(self, item: dict) -> None: ...
+```
+
+Cualquier clase con esos dos métodos **encaja**, sin heredar de nada y sin
+saber que el protocolo existe. El verificador de tipos lo comprueba en
+desarrollo. Es lo que querrás casi siempre para definir las fronteras de tu
+sistema: das el contrato sin imponer la herencia.
+
+## 9. Recursión: funciones que se llaman a sí mismas
+
+Una función recursiva se define en términos de sí misma, y necesita dos cosas
+para no ser un bucle infinito: un **caso base** que no recurre y una llamada que
+se acerca a él.
+
+```python
+def factorial(n: int) -> int:
+    if n <= 1:            # caso base
+        return 1
+    return n * factorial(n - 1)
+```
+
+Dónde se paga de verdad no es en los factoriales —ahí un bucle se lee mejor—
+sino en las **estructuras anidadas**, donde la forma del problema es recursiva:
+
+```python
+def total_size(node: dict) -> int:
+    """Suma el tamaño de un árbol de carpetas anidadas."""
+    if "size" in node:                        # es un archivo
+        return node["size"]
+    return sum(total_size(hijo) for hijo in node["children"])
+```
+
+Un bucle tendría que gestionar una pila a mano; la recursión deja que la use el
+lenguaje. Ese es el criterio: **si el dato es recursivo, el código quiere serlo**.
+
+Dos avisos: Python tiene un límite de profundidad (unas mil llamadas por
+defecto), y no optimiza la recursión de cola. Para árboles de datos normales
+sobra; para recorrer un millón de niveles, no.
+
+## 10. Qué pasa exactamente en un `import`
 
 `import billing` hace cuatro cosas, en este orden:
 
@@ -323,24 +534,38 @@ uv run pytest ruta/03-poo-y-modulos
   errores de dominio.
 - **`ejercicios/base/transferencia.py`** — una dataclass inmutable que se
   valida al nacer.
+- **`ejercicios/base/propiedad.py`** — encapsular con `@property`, incluida la
+  validación en el setter y un valor derivado.
 - **`ejercicios/reto/dinero.py`** — hacer que tu tipo hable los protocolos de
   comparación y aritmética.
+- **`ejercicios/reto/herencia.py`** — una jerarquía pequeña con `super()`, y
+  leer su MRO.
+- **`ejercicios/reto/recorrer.py`** — recursión sobre una estructura anidada.
 
 ## Resumen
 
 - `self` explícito y sin `private`: Python prefiere convenciones a barandillas.
+  El doble guion bajo no es privacidad, es evitar colisiones.
 - El dinero va en enteros de la unidad mínima o en `Decimal`. Nunca en `float`.
+- Métodos de instancia para el objeto, de clase para constructores
+  alternativos, estáticos para lo que pertenece conceptualmente.
 - Los atributos se resuelven recorriendo diccionarios: instancia, clase, bases.
   Un mutable como atributo de clase se comparte entre todas las instancias.
+- Empieza con atributos públicos; conviértelos en `@property` el día que
+  necesites validar. Nadie que use tu clase se entera.
 - `@dataclass(frozen=True, slots=True)` te da `__init__`, `__repr__` y `__eq__`
-  gratis; `__post_init__` es donde valida.
+  gratis; `field(default_factory=...)` para los mutables; `__post_init__` valida.
+- `__repr__` es para quien programa; `__str__` para quien lee la salida.
 - Devuelve `NotImplemented` (no `NotImplementedError`) cuando tu dunder no sabe
-  operar con el otro tipo.
+  operar con el otro tipo. Y define `__hash__` si defines `__eq__`.
+- `super()` significa "el siguiente del MRO", no "mi padre". El MRO se consulta
+  con `__mro__`.
 - Hereda para *es un*; compón para *tiene un*. Heredar para reutilizar código
   suele ser composición mal hecha.
-- Importar es: caché → localizar → registrar → ejecutar una vez → vincular. De
-  ahí salen los módulos como singleton y el "define, no actúes" del nivel
-  superior.
+- ABC impone herencia y da garantías fuertes; `Protocol` da el contrato sin
+  imponer nada. Para fronteras, `Protocol`.
+- Si el dato es recursivo, el código quiere serlo. Caso base primero.
+- Importar es: caché → localizar → registrar → ejecutar una vez → vincular.
 - Un ciclo de imports es un diagnóstico de diseño. Cura correcta: extraer el
   concepto común.
 - Un módulo se nombra por su dominio. `utils` no es un dominio.
@@ -349,17 +574,25 @@ uv run pytest ruta/03-poo-y-modulos
 
 1. ¿Por qué `items = []` dentro del cuerpo de una clase casi nunca es lo que
    querías?
-2. ¿Qué te da `frozen=True` además de impedir asignaciones?
-3. ¿Cuál es la diferencia entre devolver `NotImplemented` y lanzar
+2. ¿Cuándo usarías un `@classmethod` en vez de un `@staticmethod`?
+3. Empiezas con `self.saldo` público y meses después necesitas validar. ¿Qué
+   tienes que cambiar en el código de quien usa tu clase?
+4. ¿Qué te da `frozen=True` además de impedir asignaciones?
+5. ¿Por qué `tags: list = []` en una dataclass da error?
+6. ¿Cuál es la diferencia entre devolver `NotImplemented` y lanzar
    `NotImplementedError` desde un `__eq__`?
-4. Un compañero hereda de `Report` para reutilizar tres métodos, pero
-   `CachedReport` no puede sustituir a `Report` en todos los sitios. ¿Qué le
-   propondrías?
-5. Importas el mismo módulo desde tres archivos distintos. ¿Cuántas veces se
-   ejecuta su código de nivel superior?
-6. Tienes un ciclo de imports que existe solo porque una anotación de tipo
-   menciona la otra clase. ¿Cuál de las tres curas aplicas?
-7. ¿Por qué el `src/` layout hace que tus tests sean más fiables?
+7. Defines `__eq__` y tu objeto deja de entrar en un `set`. ¿Qué pasó?
+8. ¿Qué diferencia hay entre `__repr__` y `__str__`, y cuál definirías si solo
+   pudieras elegir uno?
+9. `super()` en una jerarquía con dos bases: ¿a cuál llama?
+10. Un compañero hereda de `Report` para reutilizar tres métodos, pero
+    `CachedReport` no puede sustituir a `Report` en todos los sitios. ¿Qué le
+    propondrías?
+11. ¿Cuándo eliges `Protocol` en vez de una ABC?
+12. Importas el mismo módulo desde tres archivos distintos. ¿Cuántas veces se
+    ejecuta su código de nivel superior?
+13. Tienes un ciclo de imports que existe solo porque una anotación de tipo
+    menciona la otra clase. ¿Cuál de las tres curas aplicas?
 
 ## Recursos
 
@@ -369,6 +602,11 @@ uv run pytest ruta/03-poo-y-modulos
 - [`dataclasses` — documentación](https://docs.python.org/es/3/library/dataclasses.html)
   — `doc-oficial` · `es` · `intermedio`. Todos los parámetros del decorador,
   con lo que hace cada uno.
+- [Descriptor HowTo](https://docs.python.org/es/3/howto/descriptor.html) —
+  `doc-oficial` · `es` · `avanzado`. Explica qué hay debajo de `@property` y de
+  los métodos. Denso y revelador.
+- [`typing.Protocol`](https://docs.python.org/es/3/library/typing.html#typing.Protocol)
+  — `doc-oficial` · `es` · `intermedio`. Duck typing verificable.
 - [El sistema de imports](https://docs.python.org/es/3/reference/import.html)
   — `doc-oficial` · `es` · `avanzado`. Denso, pero es la referencia cuando un
   import hace algo que no esperabas.
