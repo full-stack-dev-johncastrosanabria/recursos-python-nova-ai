@@ -409,9 +409,9 @@ cp .env.example .env    # y pon tu ANTHROPIC_API_KEY
 - [The Illustrated Transformer](https://jalammar.github.io/illustrated-transformer/)
   — `artículo` · `en` · `avanzado`. La arquitectura explicada con dibujos. Es
   el mejor material que existe para entender qué hay debajo.
-- [Tokenizador interactivo](https://platform.openai.com/tokenizer) —
-  `doc-oficial` · `en` · `principiante`. Para ver con los ojos cómo se parte tu
-  texto.
+- [OpenAI Cookbook — contar tokens con tiktoken](https://developers.openai.com/cookbook/examples/how_to_count_tokens_with_tiktoken) —
+  `doc-oficial` · `en` · `principiante`. Ejemplos reproducibles para dividir
+  texto en tokens y contar su longitud.
 
 ## Siguiente
 
