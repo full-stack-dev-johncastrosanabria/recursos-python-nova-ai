@@ -419,8 +419,8 @@ uv run pytest ruta/07-datos-y-apis
   de `os.path`.
 - [Pydantic](https://docs.pydantic.dev/) — `doc-oficial` · `en` · `intermedio`.
   Empieza por *Models* y por *Validators*.
-- [httpx](https://www.python-httpx.org/advanced/) — `doc-oficial` · `en` ·
-  `intermedio`. La guía avanzada explica timeouts, límites y streaming.
+- [HTTPX — clientes](https://www.python-httpx.org/advanced/clients/) — `doc-oficial` · `en` ·
+  `intermedio`. La guía explica clientes, conexiones reutilizables y configuración compartida.
 - [FastAPI — tutorial](https://fastapi.tiangolo.com/es/tutorial/) —
   `doc-oficial` · `es` · `intermedio`. En español y de los mejores que existen.
 - [pandas — 10 minutos](https://pandas.pydata.org/docs/user_guide/10min.html)
