@@ -515,8 +515,8 @@ uv run pytest ruta/04-entorno-y-herramientas
 - [Logging HOWTO](https://docs.python.org/es/3/howto/logging.html) —
   `doc-oficial` · `es` · `intermedio`. En español, y con la configuración
   explicada de menos a más.
-- [Python Packaging User Guide](https://packaging.python.org/es/) —
-  `doc-oficial` · `es` · `intermedio`. Para cuando toque publicar.
+- [Python Packaging User Guide](https://packaging.python.org/en/latest/) —
+  `doc-oficial` · `en` · `intermedio`. Para cuando toque publicar.
 
 ## Siguiente
 
